@@ -45,6 +45,17 @@ import org.microbean.construct.Domain;
 
 import static java.lang.constant.ConstantDescs.BSM_INVOKE;
 
+/**
+ * A partial implementation of a {@link Matcher} that tests if one {@link TypeMirror} <dfn>matches</dfn> another.
+ *
+ * <p>This class consists primarily of utility methods useful for assisting in implementing type matching according to a
+ * variety of rules, such as those described or implemented by <a
+ * href="https://jakarta.ee/specifications/cdi/4.1/jakarta-cdi-spec-4.1#typesafe_resolution">CDI</a> or <a
+ * href="https://github.com/spring-projects/spring-framework/blob/main/spring-core/src/main/java/org/springframework/util/TypeUtils.java">the
+ * Spring framework</a>.
+ *
+ * @author <a href="https://about.me/lairdnelson" target="_top">Laird Nelson</a>
+ */
 public abstract class AbstractTypeMatcher implements Constable, Matcher<TypeMirror, TypeMirror> {
 
 
@@ -69,9 +80,14 @@ public abstract class AbstractTypeMatcher implements Constable, Matcher<TypeMirr
    */
 
 
+  /**
+   * Creates a new {@link AbstractTypeMatcher}.
+   *
+   * @param domain a {@link Domain}; must not be {@code null}
+   */
   protected AbstractTypeMatcher(final Domain domain) {
     super();
-    this.domain = domain;
+    this.domain = Objects.requireNonNull(domain, "domain");
   }
 
 
@@ -89,9 +105,11 @@ public abstract class AbstractTypeMatcher implements Constable, Matcher<TypeMirr
   //
   // The semantics CDI wants to express are really: can t *yield* a raw type, for a certain definition of "yield"? See
   // Types#yieldsRawType(TypeMirror).
+  /*
   protected final boolean cdiParameterized(final TypeMirror t) {
     return this.yieldsRawType(t);
   }
+  */
 
   // Is payload's condensed super bound (lower bound) covariantly assignable to receiver?
   //
@@ -204,6 +222,14 @@ public abstract class AbstractTypeMatcher implements Constable, Matcher<TypeMirr
   // (Is there one bound in (condensed) payloadBounds that matches all bounds in (condensed) receiverBounds?)
   //
   // (Because of the javax.lang.model.* isAssignable() semantics, condensing turns out to be entirely unnecessary.)
+  /*
+   * Returns {@code true} if and only if {@linkplain #covariantlyAssignable(TypeMirror, List) at least one
+   * <code>TypeMirror</code> in <code>payloadBounds</code> is covariantly assignable to all of the
+   * <code>TypeMirror</code>s in <code>receiverBounds</code>}.
+   *
+   * @param receiverBounds a {@link List} of {@link TypeMirror}s representing the bounds of
+   */
+  /*
   protected final boolean covariantlyAssignable(final List<? extends TypeMirror> receiverBounds, List<? extends TypeMirror> payloadBounds) {
     for (final TypeMirror receiverBound : receiverBounds) {
       if (!covariantlyAssignable(receiverBound, payloadBounds)) {
@@ -211,7 +237,7 @@ public abstract class AbstractTypeMatcher implements Constable, Matcher<TypeMirr
       }
     }
     return true;
-    /*
+    / *
     payloadBounds = this.types.condense(payloadBounds);
     for (final TypeMirror receiverBound : this.types.condense(receiverBounds)) {
       if (!covariantlyAssignable(receiverBound, payloadBounds)) {
@@ -219,10 +245,12 @@ public abstract class AbstractTypeMatcher implements Constable, Matcher<TypeMirr
       }
     }
     return true;
-    */
+    * /
   }
+  */
 
   // Is there a bound in payloadBounds that is assignable to receiver using Java, not CDI, assignability semantics?
+  /*
   protected final boolean covariantlyAssignable(final TypeMirror receiver, final List<? extends TypeMirror> payloadBounds) {
     for (final TypeMirror payloadBound : payloadBounds) {
       if (covariantlyAssignable(receiver, payloadBound)) {
@@ -230,7 +258,7 @@ public abstract class AbstractTypeMatcher implements Constable, Matcher<TypeMirr
       }
     }
     return false;
-    /*
+    / *
     return switch (receiver.getKind()) {
     case ARRAY, DECLARED -> {
       for (final TypeMirror condensedPayloadBound : payloadBounds) {
@@ -249,9 +277,27 @@ public abstract class AbstractTypeMatcher implements Constable, Matcher<TypeMirr
     }
     default -> throw new IllegalArgumentException("receiver: " + receiver + "; kind: " + receiver.getKind());
     };
-    */
+    * /
   }
+  */
 
+  /**
+   * Returns {@code true} if and only if {@code payload} is <dfn>covariantly assignable</dfn> to {@code receiver}.
+   *
+   * <p>The default implementation of this method returns the result of invoking {@link Domain#assignable(TypeMirror,
+   * TypeMirror)} on the return value of an invocation of the {@link #domain()} method, supplying the two arguments
+   * <strong>in reverse order</strong>.</p>
+   *
+   * @param receiver a {@link TypeMirror}; must not be {@code null}; the "left hand side" of the putative assignment
+   *
+   * @param payload a {@link TypeMirror}; must not be {@code null}; the "right hand side" of the putative assignment
+   *
+   * @return {@code true} if and only if {@code payload} is <dfn>covariantly assignable</dfn> to {@code receiver}
+   *
+   * @exception NullPointerException if either argument is {@code null}
+   *
+   * @see Domain#assignable(TypeMirror, TypeMirror) 
+   */
   // Is classOrArrayTypePayload assignable to receiver following the rules of Java assignability
   // (i.e. covariance)?
   protected boolean covariantlyAssignable(final TypeMirror receiver, final TypeMirror payload) {
@@ -307,6 +353,30 @@ public abstract class AbstractTypeMatcher implements Constable, Matcher<TypeMirr
   // javax.lang.model.util.Types#isSameType(TypeMirror, TypeMirror) method. That method will return false if either
   // argument is a wildcard type. This method first checks to see if the arguments are the same Java references (==),
   // regardless of type.
+  /**
+   * A utility method that returns {@code true} if and only if this {@link AbstractTypeMatcher} implementation considers
+   * the two supplied {@link TypeMirror}s to be <dfn>identical</dfn>.
+   *
+   * <p>The default implementation returns {@code true} if {@code receiver} is literally the very same Java object
+   * reference as {@code payload}, or if an invocation of {@link Domain#sameType(TypeMirror, TypeMirror)} with the two
+   * arguments returns {@code true}.</p>
+   *
+   * <p>(As an arbitrary counterexample, Spring <a
+   * href="https://github.com/spring-projects/spring-framework/blob/v6.2.1/spring-core/src/main/java/org/springframework/util/TypeUtils.java#L57">relies
+   * on</a> {@linkplain Object#equals(Object) the <code>equals</code> method of <code>java.lang.reflect.Type</code>},
+   * whose behavior is effectively undefined.)</p>
+   *
+   * @param receiver a {@link TypeMirror}; must not be {@code null}
+   *
+   * @param payload a {@link TypeMirror}; must not be {@code null}
+   *
+   * @return {@code true} if and only if this {@link AbstractTypeMatcher} implementation considers the two supplied
+   * {@link TypeMirror}s to be identical; {@code false} otherwise
+   *
+   * @exception NullPointerException if either argument is {@code null}
+   *
+   * @see Domain#sameType(TypeMirror, TypeMirror)
+   */
   protected boolean identical(final TypeMirror receiver, final TypeMirror payload) {
     // CDI has an undefined notion of "identical to". This method attempts to divine and implement the intent. Recall
     // that javax.lang.model.* compares types with "sameType" semantics.
@@ -316,10 +386,42 @@ public abstract class AbstractTypeMatcher implements Constable, Matcher<TypeMirr
   }
 
   // Return t if its element declares a non-generic class, or if it is the raw type usage of a generic class.
+  /**
+   * Returns the supplied {@link TypeMirror} if it is a kind that cannot {@linkplain #yieldsRawType(TypeMirror) yield a
+   * raw type}, or the {@linkplain Domain#rawType(TypeMirror) raw type} that {@code t} yields.
+   *
+   * @param t a {@link TypeMirror}; must not be {@code null}
+   *
+   * @return the supplied {@link TypeMirror} if it is a kind that cannot {@linkplain #yieldsRawType(TypeMirror) yield a
+   * raw type}, or the {@linkplain Domain#rawType(TypeMirror) raw type} that {@code t} yields
+   *
+   * @exception NullPointerException if {@code t} is {@code null}
+   *
+   * @see #yieldsRawType(TypeMirror)
+   *
+   * @see Domain#rawType(TypeMirror)
+   */
   protected TypeMirror nonGenericClassOrRawType(final TypeMirror t) {
     return this.yieldsRawType(t) ? this.domain().rawType(t) : t;
   }
 
+  /**
+   * A convenience method that returns {@code true} if and only if {@code t} is a {@linkplain TypeKind#TYPEVAR type
+   * variable} whose {@linkplain TypeVariable#getUpperBound() upper bound} is an unbounded type variable (recursively),
+   * or is the type declared by {@code java.lang.Object}.
+   *
+   * @param t a {@link TypeMirror}; must not be {@code null}
+   *
+   * @return {@code true} if and only if {@code t} is a {@linkplain TypeKind#TYPEVAR type variable} whose {@linkplain
+   * TypeVariable#getUpperBound() upper bound} is an unbounded type variable (recursively), or is the type declared by
+   * {@code java.lang.Object}
+   *
+   * @exception NullPointerException if {@code t} is {@code null}
+   *
+   * @see TypeVariable#getUpperBound()
+   *
+   * @see Domain#javaLangObject(TypeMirror)
+   */
   // Is t an unbounded type variable?
   //
   // CDI does not define what an "unbounded type variable" is. This method attempts to divine and implement the intent.
@@ -353,6 +455,19 @@ public abstract class AbstractTypeMatcher implements Constable, Matcher<TypeMirr
     */
   }
 
+  /**
+   * Returns {@code true} if and only if {@code t} is either a parameterized type or an array type whose element type is
+   * parameterized.
+   *
+   * @param t a {@link TypeMirror}; must not be {@code null}
+   *
+   * @return {@code true} if and only if {@code t} is either a parameterized type or an array type whose element type is
+   * parameterized
+   *
+   * @exception NullPointerException if {@code t} is {@code null}
+   *
+   * @see Domain#rawType(TypeMirror)
+   */
   // Can t *yield* a raw type? (Is t parameterized or an array type with a parameterized element type?)
   //
   // We say that to yield a raw type, t must be either:
@@ -372,9 +487,23 @@ public abstract class AbstractTypeMatcher implements Constable, Matcher<TypeMirr
    */
 
 
-  // Do all supplied TypeMirrors, when used as type arguments, pass the test represented by the supplied Predicate?
-  protected static final boolean allTypeArgumentsAre(final Iterable<? extends TypeMirror> typeArguments, final Predicate<? super TypeMirror> p) {
-    for (final TypeMirror t : typeArguments) {
+  /**
+   * A convenience method that returns {@code true} if and only if all elements supplied by the supplied {@link
+   * Iterable} "pass" the supplied {@link Predicate}.
+   *
+   * @param <T> the type of an element
+   *
+   * @param ts an {@link Iterable}; must not be {@code null}
+   *
+   * @param p a {@link Predicate}; must not be {@code null}
+   *
+   * @return {@code true} if and only if all elements supplied by the supplied {@link Iterable} "pass" the supplied
+   * {@link Predicate}; {@code false} otherwise
+   *
+   * @exception NullPointerException if either argument is {@code null}
+   */
+  protected static final <T> boolean allAre(final Iterable<? extends T> ts, final Predicate<? super T> p) {
+    for (final T t : ts) {
       if (!p.test(t)) {
         return false;
       }
@@ -382,6 +511,23 @@ public abstract class AbstractTypeMatcher implements Constable, Matcher<TypeMirr
     return true;
   }
 
+  /**
+   * A convenience method that returns {@code true} if and only if the {@link QualifiedNameable} that {@linkplain
+   * DeclaredType#asElement() declares} the supplied {@link DeclaredType} {@linkplain
+   * QualifiedNameable#getQualifiedName() has a qualified name} that is {@linkplain
+   * javax.lang.model.element.Name#contentEquals(CharSequence) equal to} the supplied {@link CharSequence}.
+   *
+   * @param t a {@link DeclaredType}; must not be {@code null}
+   *
+   * @param n a {@link CharSequence}; must not be {@code null}
+   *
+   * @return {@code true} if and only if the {@link QualifiedNameable} that {@linkplain DeclaredType#asElement()
+   * declares} the supplied {@link DeclaredType} {@linkplain QualifiedNameable#getQualifiedName() has a qualified name}
+   * that is {@linkplain javax.lang.model.element.Name#contentEquals(CharSequence) equal to} the supplied {@link
+   * CharSequence}
+   *
+   * @exception NullPointerException if any argument is {@code null}
+   */
   // Regardless of its reported TypeKind, does t's declaring TypeElement bear the supplied fully qualified name?
   //
   // Throws ClassCastException if the return value of t.asElement() is not a TypeElement.
