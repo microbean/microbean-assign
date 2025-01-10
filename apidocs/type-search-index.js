@@ -1,0 +1,1 @@
+typeSearchIndex = [{"p":"org.microbean.assign","l":"AbstractTypeMatcher"},{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"org.microbean.assign","l":"Matcher"},{"p":"org.microbean.assign","l":"Qualifiers"},{"p":"org.microbean.assign","l":"Types"}];updateSearchResults();
