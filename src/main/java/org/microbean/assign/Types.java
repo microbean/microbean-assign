@@ -47,6 +47,8 @@ import org.microbean.construct.Domain;
 
 import static java.lang.constant.ConstantDescs.BSM_INVOKE;
 
+import static java.util.Comparator.comparing;
+
 import static java.util.HashSet.newHashSet;
 
 import static java.util.stream.Stream.concat;
@@ -96,7 +98,9 @@ public class Types implements Constable {
   public Types(final Domain domain) {
     super();
     this.domain = Objects.requireNonNull(domain, "domain");
-    this.c = new SpecializationComparator();
+    this.c = comparing(TypeMirror::getKind, TypeVariablesFirstTypeKindComparator.INSTANCE)
+      .thenComparing(new SpecializationComparator(domain))
+      .thenComparing(Types::erasedName);
   }
 
 
@@ -182,12 +186,12 @@ public class Types implements Constable {
   }
 
   /**
-   * Returns a non-{@code null}, immutable {@link List} of the supertypes of the supplied {@link TypeMirror}.
+   * Returns a non-{@code null} {@link SupertypeList} of the supertypes of the supplied {@link TypeMirror}.
    *
    * <p>No element in the returned {@link List} will be {@code null}.</p>
    *
-   * <p>The supplied {@link TypeMirror} will be the first element in the returned {@link List}. (The supertype relation
-   * is reflexive.)</p>
+   * <p>The supplied {@link TypeMirror} will be the first element in the returned {@link SupertypeList}. (The supertype
+   * relation is reflexive.)</p>
    *
    * <p>No two elements in the list will be {@linkplain Objects#equals(Object) equal} or {@linkplain
    * Domain#sameType(TypeMirror, TypeMirror) the same type}. (The {@link List} is an ordered set.)</p>
@@ -208,7 +212,7 @@ public class Types implements Constable {
    *
    * @param t a {@link TypeMirror}; must not be {@code null}
    *
-   * @return a non-{@code null}, immutable {@link List} of the supertypes of the supplied {@link TypeMirror}
+   * @return a non-{@code null} {@link SupertypeList} of the supertypes of the supplied {@link TypeMirror}
    *
    * @exception NullPointerException if {@code t} is {@code null}
    *
@@ -222,25 +226,25 @@ public class Types implements Constable {
    * @spec https://docs.oracle.com/javase/specs/jls/se23/html/jls-4.html#jls-4.10.2 Java Language Specification, section
    * 4.10.2
    */
-  public final List<? extends TypeMirror> supertypes(final TypeMirror t) {
+  public final SupertypeList supertypes(final TypeMirror t) {
     return this.supertypes(t, Types::returnTrue);
   }
 
   /**
-   * Returns a non-{@code null}, immutable {@link List} of the supertypes of the supplied {@link TypeMirror}, filtered
+   * Returns a non-{@code null} {@link SupertypeList} of the supertypes of the supplied {@link TypeMirror}, filtered
    * using the supplied {@link Predicate}.
    *
-   * <p>No element in the returned {@link List} will be {@code null}.</p>
+   * <p>No element in the returned {@link SupertypeList} will be {@code null}.</p>
    *
    * <p>Unless the supplied {@link Predicate} prevents it, the supplied {@link TypeMirror} will be the first element in
-   * the returned {@link List}. (The supertype relation is reflexive.)</p>
+   * the returned {@link SupertypeList}. (The supertype relation is reflexive.)</p>
    *
    * <p>No two elements in the list will be {@linkplain Objects#equals(Object) equal} or {@linkplain
-   * Domain#sameType(TypeMirror, TypeMirror) the same type}. (The {@link List} is an ordered set.)</p>
+   * Domain#sameType(TypeMirror, TypeMirror) the same type}. (The {@link SupertypeList} is an ordered set.)</p>
    *
    * <p>This method returns determinate values.</p>
    *
-   * <p>The elements of the returned {@link List} will be in the following (partial) order:</p>
+   * <p>The elements of the returned {@link SupertypeList} will be in the following (partial) order:</p>
    *
    * <ol>
    *
@@ -254,7 +258,7 @@ public class Types implements Constable {
    *
    * @param p a {@link Predicate}; must not be {@code null}
    *
-   * @return a non-{@code null}, immutable {@link List} of the supertypes of the supplied {@link TypeMirror}, filtered
+   * @return a non-{@code null} {@link SupertypeList} of the supertypes of the supplied {@link TypeMirror}, filtered
    * using the supplied {@link Predicate}
    *
    * @exception NullPointerException if either {@code t} or {@code p} is {@code null}
@@ -267,16 +271,16 @@ public class Types implements Constable {
    * @spec https://docs.oracle.com/javase/specs/jls/se23/html/jls-4.html#jls-4.10.2 Java Language Specification, section
    * 4.10.2
    */
-  public final List<? extends TypeMirror> supertypes(final TypeMirror t, final Predicate<? super TypeMirror> p) {
+  public final SupertypeList supertypes(final TypeMirror t, final Predicate<? super TypeMirror> p) {
     final ArrayList<TypeMirror> nonInterfaceTypes = new ArrayList<>(7); // arbitrary size
     final ArrayList<TypeMirror> interfaceTypes = new ArrayList<>(17); // arbitrary size
     supertypes(t, p, nonInterfaceTypes, interfaceTypes, newHashSet(13)); // arbitrary size
     nonInterfaceTypes.trimToSize();
     interfaceTypes.trimToSize();
     return
-      concat(nonInterfaceTypes.stream(), // non-interface supertypes are already sorted from most-specific to least
-             interfaceTypes.stream().sorted(this.c)) // have to sort interfaces because you can extend them in any order
-      .toList();
+      new SupertypeList(concat(nonInterfaceTypes.stream(), // non-interface supertypes are already sorted from most-specific to least
+                               interfaceTypes.stream().sorted(this.c)) // have to sort interfaces because you can extend them in any order
+                        .toList());
   }
 
   private final void supertypes(final TypeMirror t,
@@ -396,41 +400,6 @@ public class Types implements Constable {
 
   private static final <T> boolean returnTrue(final T ignored) {
     return true;
-  }
-
-
-  /*
-   * Inner and nested classes.
-   */
-
-
-  private final class SpecializationComparator implements Comparator<TypeMirror> {
-
-    private SpecializationComparator() {
-      super();
-    }
-
-    @Override
-    public final int compare(final TypeMirror t, final TypeMirror s) {
-      if (t == s) {
-        return 0;
-      } else if (t == null) {
-        return 1; // nulls right
-      } else if (s == null) {
-        return -1; // nulls right
-      } else if (domain.sameType(t, s)) {
-        return 0;
-      } else if (domain.subtype(t, s)) {
-        // t is a subtype of s; s is a proper supertype of t
-        return -1;
-      } else if (domain.subtype(s, t)) {
-        // s is a subtype of t; t is a proper supertype of s
-        return 1;
-      } else {
-        return erasedName(t).compareTo(erasedName(s));
-      }
-    }
-
   }
 
 }

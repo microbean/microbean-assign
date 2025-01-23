@@ -199,7 +199,7 @@ public final class Qualifiers {
     final ArrayList<NamedAttributeMap<?>> list = new ArrayList<>(c.size());
     for (final NamedAttributeMap<?> a : c) {
       if (qualifier(a)) {
-        list.add(a);
+        list.add(normalize(a));
       }
     }
     list.trimToSize();
