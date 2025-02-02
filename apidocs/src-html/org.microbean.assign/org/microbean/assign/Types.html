@@ -290,132 +290,134 @@
 <span class="source-line-no">277</span><span id="line-277">    supertypes(t, p, nonInterfaceTypes, interfaceTypes, newHashSet(13)); // arbitrary size</span>
 <span class="source-line-no">278</span><span id="line-278">    nonInterfaceTypes.trimToSize();</span>
 <span class="source-line-no">279</span><span id="line-279">    interfaceTypes.trimToSize();</span>
-<span class="source-line-no">280</span><span id="line-280">    return</span>
-<span class="source-line-no">281</span><span id="line-281">      new SupertypeList(concat(nonInterfaceTypes.stream(), // non-interface supertypes are already sorted from most-specific to least</span>
-<span class="source-line-no">282</span><span id="line-282">                               interfaceTypes.stream().sorted(this.c)) // have to sort interfaces because you can extend them in any order</span>
-<span class="source-line-no">283</span><span id="line-283">                        .toList());</span>
-<span class="source-line-no">284</span><span id="line-284">  }</span>
-<span class="source-line-no">285</span><span id="line-285"></span>
-<span class="source-line-no">286</span><span id="line-286">  private final void supertypes(final TypeMirror t,</span>
-<span class="source-line-no">287</span><span id="line-287">                                final Predicate&lt;? super TypeMirror&gt; p,</span>
-<span class="source-line-no">288</span><span id="line-288">                                final ArrayList&lt;? super TypeMirror&gt; nonInterfaceTypes,</span>
-<span class="source-line-no">289</span><span id="line-289">                                final ArrayList&lt;? super TypeMirror&gt; interfaceTypes,</span>
-<span class="source-line-no">290</span><span id="line-290">                                final Set&lt;? super String&gt; seen) {</span>
-<span class="source-line-no">291</span><span id="line-291">    if (seen.add(erasedName(t))) {</span>
-<span class="source-line-no">292</span><span id="line-292">      if (p.test(t)) {</span>
-<span class="source-line-no">293</span><span id="line-293">        if (isInterface(t)) {</span>
-<span class="source-line-no">294</span><span id="line-294">          interfaceTypes.add(t); // reflexive</span>
-<span class="source-line-no">295</span><span id="line-295">        } else {</span>
-<span class="source-line-no">296</span><span id="line-296">          nonInterfaceTypes.add(t); // reflexive</span>
-<span class="source-line-no">297</span><span id="line-297">        }</span>
-<span class="source-line-no">298</span><span id="line-298">      }</span>
-<span class="source-line-no">299</span><span id="line-299">      for (final TypeMirror directSupertype : domain.directSupertypes(t)) {</span>
-<span class="source-line-no">300</span><span id="line-300">        this.supertypes(directSupertype, p, nonInterfaceTypes, interfaceTypes, seen);</span>
-<span class="source-line-no">301</span><span id="line-301">      }</span>
-<span class="source-line-no">302</span><span id="line-302">    }</span>
-<span class="source-line-no">303</span><span id="line-303">  }</span>
-<span class="source-line-no">304</span><span id="line-304"></span>
-<span class="source-line-no">305</span><span id="line-305"></span>
-<span class="source-line-no">306</span><span id="line-306">  /*</span>
-<span class="source-line-no">307</span><span id="line-307">   * Static methods.</span>
-<span class="source-line-no">308</span><span id="line-308">   */</span>
-<span class="source-line-no">309</span><span id="line-309"></span>
-<span class="source-line-no">310</span><span id="line-310"></span>
-<span class="source-line-no">311</span><span id="line-311">  private static final String erasedName(final CharSequence cs) {</span>
-<span class="source-line-no">312</span><span id="line-312">    return cs instanceof String s ? s : cs.toString();</span>
-<span class="source-line-no">313</span><span id="line-313">  }</span>
-<span class="source-line-no">314</span><span id="line-314"></span>
-<span class="source-line-no">315</span><span id="line-315">  private static final String erasedName(final Element e) {</span>
-<span class="source-line-no">316</span><span id="line-316">    return e instanceof QualifiedNameable qn ? erasedName(qn) : erasedName(e.getSimpleName());</span>
-<span class="source-line-no">317</span><span id="line-317">  }</span>
-<span class="source-line-no">318</span><span id="line-318"></span>
-<span class="source-line-no">319</span><span id="line-319">  private static final String erasedName(final QualifiedNameable qn) {</span>
-<span class="source-line-no">320</span><span id="line-320">    final CharSequence n = qn.getQualifiedName();</span>
-<span class="source-line-no">321</span><span id="line-321">    return n == null || n.isEmpty() ? erasedName(qn.getSimpleName()) : erasedName(n);</span>
-<span class="source-line-no">322</span><span id="line-322">  }</span>
-<span class="source-line-no">323</span><span id="line-323"></span>
-<span class="source-line-no">324</span><span id="line-324">  /**</span>
-<span class="source-line-no">325</span><span id="line-325">   * Returns the &lt;dfn&gt;erased name&lt;/dfn&gt; of the supplied {@link TypeMirror}.</span>
-<span class="source-line-no">326</span><span id="line-326">   *</span>
-<span class="source-line-no">327</span><span id="line-327">   * &lt;p&gt;&lt;dfn&gt;Erased name&lt;/dfn&gt; is not a term defined or used by the Java Language Specification. Its definition and</span>
-<span class="source-line-no">328</span><span id="line-328">   * contract follow.&lt;/p&gt;</span>
-<span class="source-line-no">329</span><span id="line-329">   *</span>
-<span class="source-line-no">330</span><span id="line-330">   * &lt;p&gt;This method is primarily for use in calculating tiebreaking values for type-related {@linkplain</span>
-<span class="source-line-no">331</span><span id="line-331">   * Comparator#compare(Object, Object) comparison operations} where type erasure can be in effect. It is also useful in</span>
-<span class="source-line-no">332</span><span id="line-332">   * testing scenarios. Most users will never call this method.&lt;/p&gt;</span>
-<span class="source-line-no">333</span><span id="line-333">   *</span>
-<span class="source-line-no">334</span><span id="line-334">   * &lt;p&gt;The erased name of a {@linkplain TypeKind#DECLARED declared type} of any kind is the erased name of its</span>
-<span class="source-line-no">335</span><span id="line-335">   * declaring {@link Element}.&lt;/p&gt;</span>
-<span class="source-line-no">336</span><span id="line-336">   *</span>
-<span class="source-line-no">337</span><span id="line-337">   * &lt;p&gt;The erased name of an {@linkplain Element element} is its {@linkplain QualifiedNameable#getQualifiedName()</span>
-<span class="source-line-no">338</span><span id="line-338">   * qualified name}, if it has one, or its {@linkplain Element#getSimpleName() simple name} if it does not.&lt;/p&gt;</span>
-<span class="source-line-no">339</span><span id="line-339">   *</span>
-<span class="source-line-no">340</span><span id="line-340">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#BOOLEAN &lt;code&gt;boolean&lt;/code&gt; primitive type} is {@code boolean}.&lt;/p&gt;</span>
+<span class="source-line-no">280</span><span id="line-280">    final int interfaceIndex = interfaceTypes.isEmpty() ? -1 : nonInterfaceTypes.size();</span>
+<span class="source-line-no">281</span><span id="line-281">    return</span>
+<span class="source-line-no">282</span><span id="line-282">      new SupertypeList(concat(nonInterfaceTypes.stream(), // non-interface supertypes are already sorted from most-specific to least</span>
+<span class="source-line-no">283</span><span id="line-283">                               interfaceTypes.stream().sorted(this.c)) // have to sort interfaces because you can extend them in any order</span>
+<span class="source-line-no">284</span><span id="line-284">                        .toList(),</span>
+<span class="source-line-no">285</span><span id="line-285">                        interfaceIndex);</span>
+<span class="source-line-no">286</span><span id="line-286">  }</span>
+<span class="source-line-no">287</span><span id="line-287"></span>
+<span class="source-line-no">288</span><span id="line-288">  private final void supertypes(final TypeMirror t,</span>
+<span class="source-line-no">289</span><span id="line-289">                                final Predicate&lt;? super TypeMirror&gt; p,</span>
+<span class="source-line-no">290</span><span id="line-290">                                final ArrayList&lt;? super TypeMirror&gt; nonInterfaceTypes,</span>
+<span class="source-line-no">291</span><span id="line-291">                                final ArrayList&lt;? super TypeMirror&gt; interfaceTypes,</span>
+<span class="source-line-no">292</span><span id="line-292">                                final Set&lt;? super String&gt; seen) {</span>
+<span class="source-line-no">293</span><span id="line-293">    if (seen.add(erasedName(t))) {</span>
+<span class="source-line-no">294</span><span id="line-294">      if (p.test(t)) {</span>
+<span class="source-line-no">295</span><span id="line-295">        if (isInterface(t)) {</span>
+<span class="source-line-no">296</span><span id="line-296">          interfaceTypes.add(t); // reflexive</span>
+<span class="source-line-no">297</span><span id="line-297">        } else {</span>
+<span class="source-line-no">298</span><span id="line-298">          nonInterfaceTypes.add(t); // reflexive</span>
+<span class="source-line-no">299</span><span id="line-299">        }</span>
+<span class="source-line-no">300</span><span id="line-300">      }</span>
+<span class="source-line-no">301</span><span id="line-301">      for (final TypeMirror directSupertype : domain.directSupertypes(t)) {</span>
+<span class="source-line-no">302</span><span id="line-302">        this.supertypes(directSupertype, p, nonInterfaceTypes, interfaceTypes, seen);</span>
+<span class="source-line-no">303</span><span id="line-303">      }</span>
+<span class="source-line-no">304</span><span id="line-304">    }</span>
+<span class="source-line-no">305</span><span id="line-305">  }</span>
+<span class="source-line-no">306</span><span id="line-306"></span>
+<span class="source-line-no">307</span><span id="line-307"></span>
+<span class="source-line-no">308</span><span id="line-308">  /*</span>
+<span class="source-line-no">309</span><span id="line-309">   * Static methods.</span>
+<span class="source-line-no">310</span><span id="line-310">   */</span>
+<span class="source-line-no">311</span><span id="line-311"></span>
+<span class="source-line-no">312</span><span id="line-312"></span>
+<span class="source-line-no">313</span><span id="line-313">  private static final String erasedName(final CharSequence cs) {</span>
+<span class="source-line-no">314</span><span id="line-314">    return cs instanceof String s ? s : cs.toString();</span>
+<span class="source-line-no">315</span><span id="line-315">  }</span>
+<span class="source-line-no">316</span><span id="line-316"></span>
+<span class="source-line-no">317</span><span id="line-317">  private static final String erasedName(final Element e) {</span>
+<span class="source-line-no">318</span><span id="line-318">    return e instanceof QualifiedNameable qn ? erasedName(qn) : erasedName(e.getSimpleName());</span>
+<span class="source-line-no">319</span><span id="line-319">  }</span>
+<span class="source-line-no">320</span><span id="line-320"></span>
+<span class="source-line-no">321</span><span id="line-321">  private static final String erasedName(final QualifiedNameable qn) {</span>
+<span class="source-line-no">322</span><span id="line-322">    final CharSequence n = qn.getQualifiedName();</span>
+<span class="source-line-no">323</span><span id="line-323">    return n == null || n.isEmpty() ? erasedName(qn.getSimpleName()) : erasedName(n);</span>
+<span class="source-line-no">324</span><span id="line-324">  }</span>
+<span class="source-line-no">325</span><span id="line-325"></span>
+<span class="source-line-no">326</span><span id="line-326">  /**</span>
+<span class="source-line-no">327</span><span id="line-327">   * Returns the &lt;dfn&gt;erased name&lt;/dfn&gt; of the supplied {@link TypeMirror}.</span>
+<span class="source-line-no">328</span><span id="line-328">   *</span>
+<span class="source-line-no">329</span><span id="line-329">   * &lt;p&gt;&lt;dfn&gt;Erased name&lt;/dfn&gt; is not a term defined or used by the Java Language Specification. Its definition and</span>
+<span class="source-line-no">330</span><span id="line-330">   * contract follow.&lt;/p&gt;</span>
+<span class="source-line-no">331</span><span id="line-331">   *</span>
+<span class="source-line-no">332</span><span id="line-332">   * &lt;p&gt;This method is primarily for use in calculating tiebreaking values for type-related {@linkplain</span>
+<span class="source-line-no">333</span><span id="line-333">   * Comparator#compare(Object, Object) comparison operations} where type erasure can be in effect. It is also useful in</span>
+<span class="source-line-no">334</span><span id="line-334">   * testing scenarios. Most users will never call this method.&lt;/p&gt;</span>
+<span class="source-line-no">335</span><span id="line-335">   *</span>
+<span class="source-line-no">336</span><span id="line-336">   * &lt;p&gt;The erased name of a {@linkplain TypeKind#DECLARED declared type} of any kind is the erased name of its</span>
+<span class="source-line-no">337</span><span id="line-337">   * declaring {@link Element}.&lt;/p&gt;</span>
+<span class="source-line-no">338</span><span id="line-338">   *</span>
+<span class="source-line-no">339</span><span id="line-339">   * &lt;p&gt;The erased name of an {@linkplain Element element} is its {@linkplain QualifiedNameable#getQualifiedName()</span>
+<span class="source-line-no">340</span><span id="line-340">   * qualified name}, if it has one, or its {@linkplain Element#getSimpleName() simple name} if it does not.&lt;/p&gt;</span>
 <span class="source-line-no">341</span><span id="line-341">   *</span>
-<span class="source-line-no">342</span><span id="line-342">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#BYTE &lt;code&gt;byte&lt;/code&gt; primitive type} is {@code byte}.&lt;/p&gt;</span>
+<span class="source-line-no">342</span><span id="line-342">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#BOOLEAN &lt;code&gt;boolean&lt;/code&gt; primitive type} is {@code boolean}.&lt;/p&gt;</span>
 <span class="source-line-no">343</span><span id="line-343">   *</span>
-<span class="source-line-no">344</span><span id="line-344">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#CHAR &lt;code&gt;char&lt;/code&gt; primitive type} is {@code char}.&lt;/p&gt;</span>
+<span class="source-line-no">344</span><span id="line-344">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#BYTE &lt;code&gt;byte&lt;/code&gt; primitive type} is {@code byte}.&lt;/p&gt;</span>
 <span class="source-line-no">345</span><span id="line-345">   *</span>
-<span class="source-line-no">346</span><span id="line-346">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#DOUBLE &lt;code&gt;double&lt;/code&gt; primitive type} is {@code double}.&lt;/p&gt;</span>
+<span class="source-line-no">346</span><span id="line-346">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#CHAR &lt;code&gt;char&lt;/code&gt; primitive type} is {@code char}.&lt;/p&gt;</span>
 <span class="source-line-no">347</span><span id="line-347">   *</span>
-<span class="source-line-no">348</span><span id="line-348">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#FLOAT &lt;code&gt;float&lt;/code&gt; primitive type} is {@code float}.&lt;/p&gt;</span>
+<span class="source-line-no">348</span><span id="line-348">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#DOUBLE &lt;code&gt;double&lt;/code&gt; primitive type} is {@code double}.&lt;/p&gt;</span>
 <span class="source-line-no">349</span><span id="line-349">   *</span>
-<span class="source-line-no">350</span><span id="line-350">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#INT &lt;code&gt;int&lt;/code&gt; primitive type} is {@code int}.&lt;/p&gt;</span>
+<span class="source-line-no">350</span><span id="line-350">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#FLOAT &lt;code&gt;float&lt;/code&gt; primitive type} is {@code float}.&lt;/p&gt;</span>
 <span class="source-line-no">351</span><span id="line-351">   *</span>
-<span class="source-line-no">352</span><span id="line-352">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#LONG &lt;code&gt;long&lt;/code&gt; primitive type} is {@code long}.&lt;/p&gt;</span>
+<span class="source-line-no">352</span><span id="line-352">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#INT &lt;code&gt;int&lt;/code&gt; primitive type} is {@code int}.&lt;/p&gt;</span>
 <span class="source-line-no">353</span><span id="line-353">   *</span>
-<span class="source-line-no">354</span><span id="line-354">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#SHORT &lt;code&gt;short&lt;/code&gt; primitive type} is {@code short}.&lt;/p&gt;</span>
+<span class="source-line-no">354</span><span id="line-354">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#LONG &lt;code&gt;long&lt;/code&gt; primitive type} is {@code long}.&lt;/p&gt;</span>
 <span class="source-line-no">355</span><span id="line-355">   *</span>
-<span class="source-line-no">356</span><span id="line-356">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#VOID &lt;code&gt;void&lt;/code&gt; type} is {@code void}.&lt;/p&gt;</span>
+<span class="source-line-no">356</span><span id="line-356">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#SHORT &lt;code&gt;short&lt;/code&gt; primitive type} is {@code short}.&lt;/p&gt;</span>
 <span class="source-line-no">357</span><span id="line-357">   *</span>
-<span class="source-line-no">358</span><span id="line-358">   * &lt;p&gt;The erased name of a {@linkplain TypeKind#TYPEVAR type variable} is the erased name of its declaring {@link</span>
-<span class="source-line-no">359</span><span id="line-359">   * javax.lang.model.element.TypeParameterElement TypeParameterElement}.&lt;/p&gt;</span>
-<span class="source-line-no">360</span><span id="line-360">   *</span>
-<span class="source-line-no">361</span><span id="line-361">   * &lt;p&gt;The erased name of an {@linkplain TypeKind#INTERSECTION intersection type} is the {@link String} formed by</span>
-<span class="source-line-no">362</span><span id="line-362">   * joining the erased names of its {@linkplain IntersectionType#getBounds() bounds} with "{@code &amp;}".&lt;/p&gt;</span>
-<span class="source-line-no">363</span><span id="line-363">   *</span>
-<span class="source-line-no">364</span><span id="line-364">   * &lt;p&gt;The erased name of an {@linkplain TypeKind#ARRAY array type} is the {@link String} formed by concatenating the</span>
-<span class="source-line-no">365</span><span id="line-365">   * erased name of its {@linkplain ArrayType#getComponentType() component type} with "{@code []}".&lt;/p&gt;</span>
-<span class="source-line-no">366</span><span id="line-366">   *</span>
-<span class="source-line-no">367</span><span id="line-367">   * &lt;p&gt;The erased name of any other {@link TypeMirror} is the return value of an invocation of its {@link</span>
-<span class="source-line-no">368</span><span id="line-368">   * Object#toString() toString()} method.&lt;/p&gt;</span>
-<span class="source-line-no">369</span><span id="line-369">   *</span>
-<span class="source-line-no">370</span><span id="line-370">   * @param t a {@link TypeMirror}; must not be {@code null}</span>
+<span class="source-line-no">358</span><span id="line-358">   * &lt;p&gt;The erased name of the {@linkplain TypeKind#VOID &lt;code&gt;void&lt;/code&gt; type} is {@code void}.&lt;/p&gt;</span>
+<span class="source-line-no">359</span><span id="line-359">   *</span>
+<span class="source-line-no">360</span><span id="line-360">   * &lt;p&gt;The erased name of a {@linkplain TypeKind#TYPEVAR type variable} is the erased name of its declaring {@link</span>
+<span class="source-line-no">361</span><span id="line-361">   * javax.lang.model.element.TypeParameterElement TypeParameterElement}.&lt;/p&gt;</span>
+<span class="source-line-no">362</span><span id="line-362">   *</span>
+<span class="source-line-no">363</span><span id="line-363">   * &lt;p&gt;The erased name of an {@linkplain TypeKind#INTERSECTION intersection type} is the {@link String} formed by</span>
+<span class="source-line-no">364</span><span id="line-364">   * joining the erased names of its {@linkplain IntersectionType#getBounds() bounds} with "{@code &amp;}".&lt;/p&gt;</span>
+<span class="source-line-no">365</span><span id="line-365">   *</span>
+<span class="source-line-no">366</span><span id="line-366">   * &lt;p&gt;The erased name of an {@linkplain TypeKind#ARRAY array type} is the {@link String} formed by concatenating the</span>
+<span class="source-line-no">367</span><span id="line-367">   * erased name of its {@linkplain ArrayType#getComponentType() component type} with "{@code []}".&lt;/p&gt;</span>
+<span class="source-line-no">368</span><span id="line-368">   *</span>
+<span class="source-line-no">369</span><span id="line-369">   * &lt;p&gt;The erased name of any other {@link TypeMirror} is the return value of an invocation of its {@link</span>
+<span class="source-line-no">370</span><span id="line-370">   * Object#toString() toString()} method.&lt;/p&gt;</span>
 <span class="source-line-no">371</span><span id="line-371">   *</span>
-<span class="source-line-no">372</span><span id="line-372">   * @return the &lt;dfn&gt;erased name&lt;/dfn&gt; of the supplied {@link TypeMirror}; never {@code null}</span>
+<span class="source-line-no">372</span><span id="line-372">   * @param t a {@link TypeMirror}; must not be {@code null}</span>
 <span class="source-line-no">373</span><span id="line-373">   *</span>
-<span class="source-line-no">374</span><span id="line-374">   * @exception NullPointerException if {@code t} is {@code null}</span>
-<span class="source-line-no">375</span><span id="line-375">   */</span>
-<span class="source-line-no">376</span><span id="line-376">  public static final String erasedName(final TypeMirror t) {</span>
-<span class="source-line-no">377</span><span id="line-377">    return switch (t.getKind()) {</span>
-<span class="source-line-no">378</span><span id="line-378">    case ARRAY -&gt; erasedName(((ArrayType)t).getComponentType()) + "[]";</span>
-<span class="source-line-no">379</span><span id="line-379">    case BOOLEAN -&gt; "boolean";</span>
-<span class="source-line-no">380</span><span id="line-380">    case BYTE -&gt; "byte";</span>
-<span class="source-line-no">381</span><span id="line-381">    case CHAR -&gt; "char";</span>
-<span class="source-line-no">382</span><span id="line-382">    case DECLARED -&gt; erasedName(((DeclaredType)t).asElement());</span>
-<span class="source-line-no">383</span><span id="line-383">    case DOUBLE -&gt; "double";</span>
-<span class="source-line-no">384</span><span id="line-384">    case FLOAT -&gt; "float";</span>
-<span class="source-line-no">385</span><span id="line-385">    case INT -&gt; "int";</span>
-<span class="source-line-no">386</span><span id="line-386">    case INTERSECTION -&gt; {</span>
-<span class="source-line-no">387</span><span id="line-387">      final StringJoiner sj = new java.util.StringJoiner("&amp;");</span>
-<span class="source-line-no">388</span><span id="line-388">      for (final TypeMirror bound : ((IntersectionType)t).getBounds()) {</span>
-<span class="source-line-no">389</span><span id="line-389">        sj.add(erasedName(bound));</span>
-<span class="source-line-no">390</span><span id="line-390">      }</span>
-<span class="source-line-no">391</span><span id="line-391">      yield sj.toString();</span>
-<span class="source-line-no">392</span><span id="line-392">    }</span>
-<span class="source-line-no">393</span><span id="line-393">    case LONG -&gt; "long";</span>
-<span class="source-line-no">394</span><span id="line-394">    case SHORT -&gt; "short";</span>
-<span class="source-line-no">395</span><span id="line-395">    case TYPEVAR -&gt; erasedName(((TypeVariable)t).asElement());</span>
-<span class="source-line-no">396</span><span id="line-396">    case VOID -&gt; "void";</span>
-<span class="source-line-no">397</span><span id="line-397">    default -&gt; t.toString();</span>
-<span class="source-line-no">398</span><span id="line-398">    };</span>
-<span class="source-line-no">399</span><span id="line-399">  }</span>
-<span class="source-line-no">400</span><span id="line-400"></span>
-<span class="source-line-no">401</span><span id="line-401">  private static final &lt;T&gt; boolean returnTrue(final T ignored) {</span>
-<span class="source-line-no">402</span><span id="line-402">    return true;</span>
-<span class="source-line-no">403</span><span id="line-403">  }</span>
-<span class="source-line-no">404</span><span id="line-404"></span>
-<span class="source-line-no">405</span><span id="line-405">}</span>
+<span class="source-line-no">374</span><span id="line-374">   * @return the &lt;dfn&gt;erased name&lt;/dfn&gt; of the supplied {@link TypeMirror}; never {@code null}</span>
+<span class="source-line-no">375</span><span id="line-375">   *</span>
+<span class="source-line-no">376</span><span id="line-376">   * @exception NullPointerException if {@code t} is {@code null}</span>
+<span class="source-line-no">377</span><span id="line-377">   */</span>
+<span class="source-line-no">378</span><span id="line-378">  public static final String erasedName(final TypeMirror t) {</span>
+<span class="source-line-no">379</span><span id="line-379">    return switch (t.getKind()) {</span>
+<span class="source-line-no">380</span><span id="line-380">    case ARRAY -&gt; erasedName(((ArrayType)t).getComponentType()) + "[]";</span>
+<span class="source-line-no">381</span><span id="line-381">    case BOOLEAN -&gt; "boolean";</span>
+<span class="source-line-no">382</span><span id="line-382">    case BYTE -&gt; "byte";</span>
+<span class="source-line-no">383</span><span id="line-383">    case CHAR -&gt; "char";</span>
+<span class="source-line-no">384</span><span id="line-384">    case DECLARED -&gt; erasedName(((DeclaredType)t).asElement());</span>
+<span class="source-line-no">385</span><span id="line-385">    case DOUBLE -&gt; "double";</span>
+<span class="source-line-no">386</span><span id="line-386">    case FLOAT -&gt; "float";</span>
+<span class="source-line-no">387</span><span id="line-387">    case INT -&gt; "int";</span>
+<span class="source-line-no">388</span><span id="line-388">    case INTERSECTION -&gt; {</span>
+<span class="source-line-no">389</span><span id="line-389">      final StringJoiner sj = new java.util.StringJoiner("&amp;");</span>
+<span class="source-line-no">390</span><span id="line-390">      for (final TypeMirror bound : ((IntersectionType)t).getBounds()) {</span>
+<span class="source-line-no">391</span><span id="line-391">        sj.add(erasedName(bound));</span>
+<span class="source-line-no">392</span><span id="line-392">      }</span>
+<span class="source-line-no">393</span><span id="line-393">      yield sj.toString();</span>
+<span class="source-line-no">394</span><span id="line-394">    }</span>
+<span class="source-line-no">395</span><span id="line-395">    case LONG -&gt; "long";</span>
+<span class="source-line-no">396</span><span id="line-396">    case SHORT -&gt; "short";</span>
+<span class="source-line-no">397</span><span id="line-397">    case TYPEVAR -&gt; erasedName(((TypeVariable)t).asElement());</span>
+<span class="source-line-no">398</span><span id="line-398">    case VOID -&gt; "void";</span>
+<span class="source-line-no">399</span><span id="line-399">    default -&gt; t.toString();</span>
+<span class="source-line-no">400</span><span id="line-400">    };</span>
+<span class="source-line-no">401</span><span id="line-401">  }</span>
+<span class="source-line-no">402</span><span id="line-402"></span>
+<span class="source-line-no">403</span><span id="line-403">  private static final &lt;T&gt; boolean returnTrue(final T ignored) {</span>
+<span class="source-line-no">404</span><span id="line-404">    return true;</span>
+<span class="source-line-no">405</span><span id="line-405">  }</span>
+<span class="source-line-no">406</span><span id="line-406"></span>
+<span class="source-line-no">407</span><span id="line-407">}</span>
 
 
 
