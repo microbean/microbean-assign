@@ -277,10 +277,12 @@ public class Types implements Constable {
     supertypes(t, p, nonInterfaceTypes, interfaceTypes, newHashSet(13)); // arbitrary size
     nonInterfaceTypes.trimToSize();
     interfaceTypes.trimToSize();
+    final int interfaceIndex = interfaceTypes.isEmpty() ? -1 : nonInterfaceTypes.size();
     return
       new SupertypeList(concat(nonInterfaceTypes.stream(), // non-interface supertypes are already sorted from most-specific to least
                                interfaceTypes.stream().sorted(this.c)) // have to sort interfaces because you can extend them in any order
-                        .toList());
+                        .toList(),
+                        interfaceIndex);
   }
 
   private final void supertypes(final TypeMirror t,

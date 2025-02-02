@@ -28,16 +28,23 @@ import javax.lang.model.type.TypeMirror;
  */
 public final class SupertypeList extends AbstractList<TypeMirror> {
 
+  private final int interfaceIndex;
+  
   private final List<TypeMirror> sortedSupertypes;
 
-  SupertypeList(final List<? extends TypeMirror> sortedSupertypes) {
+  SupertypeList(final List<? extends TypeMirror> sortedSupertypes, final int interfaceIndex) {
     super();
     if (sortedSupertypes.isEmpty()) {
       throw new IllegalArgumentException();
     }
     switch (sortedSupertypes) {
-    case SupertypeList sl -> this.sortedSupertypes = sl.sortedSupertypes;
-    default -> this.sortedSupertypes = List.copyOf(sortedSupertypes);
+    case SupertypeList sl:
+      this.sortedSupertypes = sl.sortedSupertypes;
+      this.interfaceIndex = sl.interfaceIndex;
+      break;
+    default:
+      this.sortedSupertypes = List.copyOf(sortedSupertypes);
+      this.interfaceIndex = interfaceIndex;
     }    
   }
 
@@ -46,6 +53,17 @@ public final class SupertypeList extends AbstractList<TypeMirror> {
     return this.sortedSupertypes.get(index);
   }
 
+  /**
+   * Returns the index of the first {@linkplain javax.lang.model.element.ElementKind#isInterface() interface type} this
+   * {@link SupertypeList} contains, or a negative value if it contains no interface types.
+   *
+   * @return the index of the first {@linkplain javax.lang.model.element.ElementKind#isInterface() interface type} this
+   * {@link SupertypeList} contains, or a negative value if it contains no interface types
+   */
+  public final int interfaceIndex() {
+    return this.interfaceIndex;
+  }
+  
   @Override // AbstractList<TypeMirror>
   public final int size() {
     return this.sortedSupertypes.size();
