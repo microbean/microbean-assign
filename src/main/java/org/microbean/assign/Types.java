@@ -98,7 +98,7 @@ public class Types implements Constable {
   public Types(final Domain domain) {
     super();
     this.domain = Objects.requireNonNull(domain, "domain");
-    this.c = comparing(TypeMirror::getKind, TypeVariablesFirstTypeKindComparator.INSTANCE)
+    this.c = comparing(TypeMirror::getKind, PrimitiveAndReferenceTypeKindComparator.INSTANCE)
       .thenComparing(new SpecializationComparator(domain))
       .thenComparing(Types::erasedName);
   }
@@ -279,8 +279,16 @@ public class Types implements Constable {
     interfaceTypes.trimToSize();
     final int interfaceIndex = interfaceTypes.isEmpty() ? -1 : nonInterfaceTypes.size();
     return
-      new SupertypeList(concat(nonInterfaceTypes.stream(), // non-interface supertypes are already sorted from most-specific to least
-                               interfaceTypes.stream().sorted(this.c)) // have to sort interfaces because you can extend them in any order
+      new SupertypeList(concat(
+                               // Non-interface supertypes are already sorted from most-specific to least and will not
+                               // contain primitive types. By extension, array types will precede declared types
+                               // (java.lang.Object). If t is a type variable, then either its supertype will be another
+                               // type variable or a declared type, so type variables precede everything.
+                               nonInterfaceTypes.stream(),
+                               // Interfaces need to be explicitly sorted because they can show up in multiple
+                               // implements clauses and you want the set to be determinate.
+                               interfaceTypes.stream().sorted(this.c)
+                               )
                         .toList(),
                         interfaceIndex);
   }
