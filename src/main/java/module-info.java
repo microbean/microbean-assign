@@ -22,7 +22,7 @@ module org.microbean.assign {
   exports org.microbean.assign;
   
   requires transitive java.compiler;
+  requires transitive org.microbean.attributes;
   requires transitive org.microbean.construct;
-  requires transitive org.microbean.qualifier;
 
 }
