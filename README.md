@@ -15,7 +15,7 @@ changes, regardless of project version and without notice.**
 
 # Requirements
 
-microBean™ Assign requires a Java runtime of version 23 or higher.
+microBean™ Assign requires a Java runtime of version 21 or higher.
 
 # Installation
 
@@ -27,7 +27,7 @@ dependency:
   <groupId>org.microbean</groupId>
   <artifactId>microbean-assign</artifactId>
   <!-- Always check https://search.maven.org/artifact/org.microbean/microbean-bean for up-to-date available versions. -->
-  <version>0.0.5</version>
+  <version>0.0.6</version>
 </dependency>
 ```
 

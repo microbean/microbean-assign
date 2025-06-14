@@ -16,7 +16,8 @@ package org.microbean.assign;
 import java.util.function.BiPredicate;
 
 /**
- * A {@link BiPredicate} with particular semantics associated with its {@link #test(Object, Object)} method.
+ * A {@link BiPredicate} with particular semantics associated with its {@link #test(Object, Object) test(Object,
+ * Object)} method.
  *
  * @param <A> the criteria object
  *

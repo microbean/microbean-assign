@@ -23,6 +23,7 @@ module org.microbean.assign {
   
   requires transitive java.compiler;
   requires transitive org.microbean.attributes;
+  requires org.microbean.constant;
   requires transitive org.microbean.construct;
 
 }
