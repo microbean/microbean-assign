@@ -73,7 +73,7 @@
     <java.util.logging.config.file>${project.basedir}/src/test/java/logging.properties</java.util.logging.config.file>
 
     <!-- maven-compiler-plugin properties -->
-    <maven.compiler.release>23</maven.compiler.release>
+    <maven.compiler.release>21</maven.compiler.release>
     <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
     <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
 
@@ -125,7 +125,7 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.11.3</version>
+        <version>5.13.1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -135,13 +135,19 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-attributes</artifactId>
-        <version>0.0.2</version>
+        <version>0.0.3</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.microbean</groupId>
+        <artifactId>microbean-constant</artifactId>
+        <version>0.0.7</version>
       </dependency>
 
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-construct</artifactId>
-        <version>0.0.10</version>
+        <version>0.0.11</version>
       </dependency>
 
     </dependencies>
@@ -154,7 +160,13 @@
       <artifactId>microbean-attributes</artifactId>
       <scope>compile</scope>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.microbean</groupId>
+      <artifactId>microbean-constant</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
     <dependency>
       <groupId>org.microbean</groupId>
       <artifactId>microbean-construct</artifactId>
@@ -308,7 +320,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>3.4.1</version>
+          <version>3.5.0</version>
           <configuration>
             <filesets>
               <fileset>
@@ -423,14 +435,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.5.2</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.apache.maven.surefire</groupId>
-              <artifactId>surefire-junit-platform</artifactId>
-              <version>3.5.2</version>
-            </dependency>
-          </dependencies>
+          <version>3.5.3</version>
         </plugin>
         <plugin>
           <artifactId>maven-toolchains-plugin</artifactId>
@@ -439,7 +444,7 @@
         <plugin>
           <groupId>com.github.spotbugs</groupId>
           <artifactId>spotbugs-maven-plugin</artifactId>
-          <version>4.9.1.0</version>
+          <version>4.9.3.0</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -449,7 +454,7 @@
         <plugin>
           <groupId>io.smallrye</groupId>
           <artifactId>jandex-maven-plugin</artifactId>
-          <version>3.2.7</version>
+          <version>3.3.1</version>
         </plugin>
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
