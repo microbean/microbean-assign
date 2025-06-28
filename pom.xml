@@ -52,20 +52,11 @@
   </issueManagement>
 
   <distributionManagement>
-    <repository>
-      <id>sonatype-oss-repository-hosting</id>
-      <!-- See https://central.sonatype.org/publish/publish-maven/#distribution-management-and-authentication -->
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
     <site>
       <id>Github Pages</id>
       <name>microBean™ Assign Site</name>
       <url>https://microbean.github.io/microbean-assign/</url>
     </site>
-    <snapshotRepository>
-      <id>sonatype-oss-repository-hosting</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
   </distributionManagement>
 
   <properties>
@@ -89,7 +80,6 @@
     <releaseProfiles>deployment</releaseProfiles>
     <scmCommentPrefix>[maven-release-plugin] [skip ci]</scmCommentPrefix>
     <tagNameFormat>v@{project.version}</tagNameFormat>
-    <useReleaseProfile>false</useReleaseProfile>
 
     <!-- maven-scm-publish-plugin properties;
          see https://maven.apache.org/plugins/maven-scm-publish-plugin/publish-scm-mojo.html -->
@@ -101,12 +91,8 @@
     <maven.site.deploy.skip>true</maven.site.deploy.skip>
     <relativizeDecorationLinks>false</relativizeDecorationLinks>
 
-    <!-- nexus-staging-maven-plugin properties -->
-    <!-- See https://github.com/sonatype/nexus-maven-plugins/blob/0aee3defb33cb133ff536aba59b11d32a368b1e6/staging/maven-plugin/src/main/java/org/sonatype/nexus/maven/staging/AbstractStagingMojo.java#L169-L175 -->
-    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-    <!-- <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl> -->
-    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-    <stagingProgressTimeoutMinutes>10</stagingProgressTimeoutMinutes>
+    <!-- central-publishing-maven-plugin properties -->
+    <deploymentName>${project.name} v${project.version}</deploymentName>
 
     <!-- Other properties -->
     <project.build.sourceEncoding>UTF8</project.build.sourceEncoding>
@@ -125,7 +111,7 @@
       <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
-        <version>5.13.1</version>
+        <version>5.13.2</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -135,19 +121,19 @@
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-attributes</artifactId>
-        <version>0.0.3</version>
+        <version>0.0.5</version>
       </dependency>
 
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-constant</artifactId>
-        <version>0.0.7</version>
+        <version>0.0.8</version>
       </dependency>
 
       <dependency>
         <groupId>org.microbean</groupId>
         <artifactId>microbean-construct</artifactId>
-        <version>0.0.11</version>
+        <version>0.0.15</version>
       </dependency>
 
     </dependencies>
@@ -314,7 +300,7 @@
             <dependency>
               <groupId>com.puppycrawl.tools</groupId>
               <artifactId>checkstyle</artifactId>
-              <version>10.12.6</version>
+              <version>10.26.0</version>
             </dependency>
           </dependencies>
         </plugin>
@@ -357,7 +343,6 @@
         </plugin>
         <plugin>
           <artifactId>maven-gpg-plugin</artifactId>
-          <!-- <version>3.1.0</version> -->
           <version>3.2.7</version>
         </plugin>
         <plugin>
@@ -402,7 +387,6 @@
         </plugin>
         <plugin>
           <artifactId>maven-release-plugin</artifactId>
-          <!-- <version>3.0.0-M6</version> --> <!-- see https://issues.apache.org/jira/browse/MRELEASE-1038 -->
           <version>3.1.1</version>
         </plugin>
         <plugin>
@@ -444,7 +428,7 @@
         <plugin>
           <groupId>com.github.spotbugs</groupId>
           <artifactId>spotbugs-maven-plugin</artifactId>
-          <version>4.9.3.0</version>
+          <version>4.9.3.1</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -457,22 +441,12 @@
           <version>3.3.1</version>
         </plugin>
         <plugin>
-          <groupId>org.sonatype.plugins</groupId>
-          <artifactId>nexus-staging-maven-plugin</artifactId>
-          <version>1.6.13</version>
+          <groupId>org.sonatype.central</groupId>
+          <artifactId>central-publishing-maven-plugin</artifactId>
+          <version>0.8.0</version>
           <extensions>true</extensions>
-          <dependencies>
-            <!-- https://issues.sonatype.org/browse/NEXUS-26993?focusedCommentId=1098136&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-1098136 -->
-            <dependency>
-              <groupId>com.thoughtworks.xstream</groupId>
-              <artifactId>xstream</artifactId>
-              <version>1.4.20</version>
-            </dependency>
-          </dependencies>
           <configuration>
-            <serverId>sonatype-oss-repository-hosting</serverId>
-            <nexusUrl>${nexusUrl}</nexusUrl>
-            <autoReleaseAfterClose>${autoReleaseAfterClose}</autoReleaseAfterClose>
+            <publishingServerId>central.sonatype.com</publishingServerId>
           </configuration>
         </plugin>
       </plugins>
@@ -518,8 +492,8 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
       </plugin>
     </plugins>
 
