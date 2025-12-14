@@ -17,12 +17,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.microbean.attributes.Attributes;
-
-import static java.util.HashMap.newHashMap;
 
 /**
  * A utility class for working with commonly-used <dfn>qualifiers</dfn>.

@@ -14,7 +14,6 @@
 package org.microbean.assign;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.SequencedSet;
 
 import java.util.function.Function;
@@ -73,6 +72,8 @@ public interface Aggregate {
    *
    * <p>Typically there is no need to override this method.</p>
    *
+   * <p>Usage of this method is not required.</p>
+   *
    * @param r a {@link Function} that retrieves a contextual reference suitable for an {@link AttributedType}; if {@link
    * #dependencies()} returns a non-empty {@link SequencedSet} then this argument must not be {@code null}
    *
@@ -87,7 +88,7 @@ public interface Aggregate {
     }
     final SequencedSet<Assignment<?>> assignments = newLinkedHashSet(ds.size());
     ds.forEach(d -> assignments.add(new Assignment<>(d, r.apply(d.attributedType()))));
-    return Collections.unmodifiableSequencedSet(assignments);
+    return unmodifiableSequencedSet(assignments);
   }
 
 }

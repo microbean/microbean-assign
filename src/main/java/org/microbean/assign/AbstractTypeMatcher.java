@@ -19,27 +19,17 @@ import java.lang.constant.ConstantDesc;
 import java.lang.constant.DynamicConstantDesc;
 import java.lang.constant.MethodHandleDesc;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import java.util.function.Predicate;
 
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.Parameterizable;
 import javax.lang.model.element.QualifiedNameable;
 
-import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.IntersectionType;
-import javax.lang.model.type.ReferenceType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
-import javax.lang.model.type.WildcardType;
 
 import org.microbean.construct.Domain;
 
@@ -401,6 +391,9 @@ public abstract class AbstractTypeMatcher implements Constable, Matcher<TypeMirr
    *
    * @see Domain#rawType(TypeMirror)
    */
+  // TODO: Domain#rawType(TypeMirror) would return the raw element type of an array, I think
+  // TODO: OK, Domain#rawType(TypeMirror) is fixed in microbean-construct v0.18-SNAPSHOT but what about
+  // AbstractTypeMatcher subclasses that use THIS method?
   protected TypeMirror nonGenericClassOrRawType(final TypeMirror t) {
     return this.yieldsRawType(t) ? this.domain().rawType(t) : t;
   }
