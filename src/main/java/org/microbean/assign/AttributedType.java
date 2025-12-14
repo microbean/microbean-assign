@@ -49,8 +49,9 @@ public final record AttributedType(TypeMirror type, List<Attributes> attributes)
    * Creates a new {@link AttributedType}.
    *
    * @param type a {@link TypeMirror}; must not be {@code null}; must be a {@linkplain
-   * javax.lang.model.type.TypeKind#isPrimitive() primitive}, {@linkplain javax.lang.model.type.TypeKind#ARRAY array} or
-   * {@linkplain javax.lang.model.type.TypeKind#DECLARED declared} type
+   * javax.lang.model.type.TypeKind#isPrimitive() primitive} type, an {@linkplain javax.lang.model.type.TypeKind#ARRAY
+   * array} type, a {@linkplain javax.lang.model.type.TypeKind#DECLARED declared} type, or a {@linkplain
+   * javax.lang.model.type.TypeKind#TYPEVAR type variable}
    *
    * @param attributes an array of {@link Attributes}; may be {@code null}
    *
@@ -66,8 +67,9 @@ public final record AttributedType(TypeMirror type, List<Attributes> attributes)
    * Creates a new {@link AttributedType}.
    *
    * @param type a {@link TypeMirror}; must not be {@code null}; must be a {@linkplain
-   * javax.lang.model.type.TypeKind#isPrimitive() primitive}, {@linkplain javax.lang.model.type.TypeKind#ARRAY array} or
-   * {@linkplain javax.lang.model.type.TypeKind#DECLARED declared} type
+   * javax.lang.model.type.TypeKind#isPrimitive() primitive} type, an {@linkplain javax.lang.model.type.TypeKind#ARRAY
+   * array} type, a {@linkplain javax.lang.model.type.TypeKind#DECLARED declared} type, or a {@linkplain
+   * javax.lang.model.type.TypeKind#TYPEVAR type variable}
    *
    * @param attributes a {@link List} of {@link Attributes}; must not be {@code null}
    *
@@ -77,9 +79,8 @@ public final record AttributedType(TypeMirror type, List<Attributes> attributes)
    */
   public AttributedType {
     switch (type.getKind()) {
-    case ARRAY, BOOLEAN, BYTE, CHAR, DECLARED, DOUBLE, FLOAT, INT, LONG, SHORT:
+    case ARRAY, BOOLEAN, BYTE, CHAR, DECLARED, DOUBLE, FLOAT, INT, LONG, SHORT, TYPEVAR:
       break;
-    case ERROR, EXECUTABLE, INTERSECTION, MODULE, NONE, NULL, OTHER, PACKAGE, TYPEVAR, UNION, VOID, WILDCARD:
     default:
       throw new IllegalArgumentException("type: " + type);
     }
@@ -124,8 +125,9 @@ public final record AttributedType(TypeMirror type, List<Attributes> attributes)
    * Returns an {@link AttributedType} comprising the supplied arguments.
    *
    * @param type a {@link TypeMirror}; must not be {@code null}; must be a {@linkplain
-   * javax.lang.model.type.TypeKind#isPrimitive() primitive}, {@linkplain javax.lang.model.type.TypeKind#ARRAY array} or
-   * {@linkplain javax.lang.model.type.TypeKind#DECLARED declared} type
+   * javax.lang.model.type.TypeKind#isPrimitive() primitive} type, an {@linkplain javax.lang.model.type.TypeKind#ARRAY
+   * array} type, a {@linkplain javax.lang.model.type.TypeKind#DECLARED declared} type, or a {@linkplain
+   * javax.lang.model.type.TypeKind#TYPEVAR type variable}
    *
    * @param attributes an array of {@link Attributes}; may be {@code null}
    *

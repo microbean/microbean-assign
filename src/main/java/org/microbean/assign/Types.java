@@ -20,7 +20,6 @@ import java.lang.constant.DynamicConstantDesc;
 import java.lang.constant.MethodHandleDesc;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -31,8 +30,6 @@ import java.util.StringJoiner;
 import java.util.function.Predicate;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.Parameterizable;
 import javax.lang.model.element.QualifiedNameable;
 
 import javax.lang.model.type.ArrayType;
@@ -41,7 +38,6 @@ import javax.lang.model.type.IntersectionType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
-import javax.lang.model.type.WildcardType;
 
 import org.microbean.construct.Domain;
 
@@ -50,8 +46,6 @@ import static java.lang.constant.ConstantDescs.BSM_INVOKE;
 import static java.util.Comparator.comparing;
 
 import static java.util.HashSet.newHashSet;
-
-import static java.util.stream.Stream.concat;
 
 /**
  * A utility class that assists with working with a {@link Domain} instance.
@@ -161,7 +155,7 @@ public class Types implements Constable {
     if (other == this) {
       return true;
     } else if (other != null && other.getClass() == this.getClass()) {
-      return this.domain().equals(((Types)other).domain());
+      return this.domain.equals(((Types)other).domain);
     } else {
       return false;
     }
@@ -174,7 +168,7 @@ public class Types implements Constable {
    */
   @Override // Object
   public int hashCode() {
-    return this.domain().hashCode();
+    return this.domain.hashCode();
   }
 
   private final boolean isInterface(final Element e) {
@@ -272,25 +266,36 @@ public class Types implements Constable {
    * 4.10.2
    */
   public final SupertypeList supertypes(final TypeMirror t, final Predicate<? super TypeMirror> p) {
-    final ArrayList<TypeMirror> nonInterfaceTypes = new ArrayList<>(7); // arbitrary size
+    // This list will start by holding non-interface types. Once it has served its purpose here, it will be reused for a
+    // different purpose.
+    ArrayList<TypeMirror> types = new ArrayList<>(7); // arbitrary size
     final ArrayList<TypeMirror> interfaceTypes = new ArrayList<>(17); // arbitrary size
-    supertypes(t, p, nonInterfaceTypes, interfaceTypes, newHashSet(13)); // arbitrary size
-    nonInterfaceTypes.trimToSize();
-    interfaceTypes.trimToSize();
-    final int interfaceIndex = interfaceTypes.isEmpty() ? -1 : nonInterfaceTypes.size();
-    return
-      new SupertypeList(concat(
-                               // Non-interface supertypes are already sorted from most-specific to least and will not
-                               // contain primitive types. By extension, array types will precede declared types
-                               // (java.lang.Object). If t is a type variable, then either its supertype will be another
-                               // type variable or a declared type, so type variables precede everything.
-                               nonInterfaceTypes.stream(),
-                               // Interfaces need to be explicitly sorted because they can show up in multiple
-                               // implements clauses and you want the set to be determinate.
-                               interfaceTypes.stream().sorted(this.c)
-                               )
-                        .toList(),
-                        interfaceIndex);
+    this.supertypes(t, p, types, interfaceTypes, newHashSet(13)); // arbitrary size
+    final int interfaceIndex;
+    if (interfaceTypes.isEmpty()) {
+      interfaceIndex = -1;
+      if (types.isEmpty()) {
+        return SupertypeList.of();
+      }
+    } else {
+      if (interfaceTypes.size() > 1) {
+        // interface types need to be sorted because they can show up in multiple implements clauses and you want the set
+        // to be determinate.
+        //
+        // (Non-interface supertypes are already sorted from most-specific to least and will not contain primitive
+        // types. By extension, array types will precede declared types (java.lang.Object). If t is a type variable, then
+        // either its supertype will be another type variable or a declared type, so type variables precede everything.)
+        interfaceTypes.sort(this.c);
+      }
+      if (types.isEmpty()) {
+        interfaceIndex = 0;
+        types = interfaceTypes;
+      } else {
+        interfaceIndex = types.size();
+        types.addAll(interfaceTypes);
+      }
+    }
+    return new SupertypeList(types, interfaceIndex);
   }
 
   private final void supertypes(final TypeMirror t,
@@ -306,8 +311,8 @@ public class Types implements Constable {
           nonInterfaceTypes.add(t); // reflexive
         }
       }
-      for (final TypeMirror directSupertype : domain.directSupertypes(t)) {
-        this.supertypes(directSupertype, p, nonInterfaceTypes, interfaceTypes, seen);
+      for (final TypeMirror directSupertype : this.domain.directSupertypes(t)) {
+        this.supertypes(directSupertype, p, nonInterfaceTypes, interfaceTypes, seen); // recursive
       }
     }
   }

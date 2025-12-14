@@ -33,14 +33,19 @@ public interface Matcher<A, B> extends BiPredicate<A, B> {
   /**
    * Returns {@code true} if and only if the second argument <dfn>matches</dfn> the first argument.
    *
+   * <p>The order of arguments may therefore be significant for {@link Matcher} implementations that do not represent
+   * equality tests.</p>
+   *
    * @param a an object serving as a kind of criteria; must not be {@code null}
    *
-   * @param b an object to test; must not be {@code null}
+   * @param b an object to test against the criteria; must not be {@code null}
    *
    * @return {@code true} if and only if the second argument <dfn>matches</dfn> the first argument; {@code false}
    * otherwise
    *
    * @exception NullPointerException if either {@code a} or {@code b} is {@code null}
+   *
+   * @exception IllegalArgumentException if either non-{@code null} argument is unsuitable for any reason
    */
   @Override // BiPredicate<A, B>
   public boolean test(final A a, final B b);
