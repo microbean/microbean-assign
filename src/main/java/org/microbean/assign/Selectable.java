@@ -36,14 +36,11 @@ public interface Selectable<C, E> {
    *
    * <p>Implementations of this method must not return {@code null}.</p>
    *
-   * <p>Implementations of this method should not call {@link #list()}, since that method is typically implemented in
-   * terms of this one, or undefined behavior may result.</p>
+   * @param criteria the criteria to use; may be {@code null} to indicate no particular criteria should be used during
+   * selection
    *
-   * @param criteria the criteria to use; may be {@code null}
-   *
-   * @return an immutable sublist of this {@link Selectable}'s elements; never {@code null}
-   *
-   * @see #list()
+   * @return an immutable sublist of this {@link Selectable}'s elements effectively selected by the supplied {@code
+   * criteria}; never {@code null}
    */
   // Filters this thing according to the supplied criteria, producing a List.
   // List not Stream to permit caching
@@ -51,23 +48,5 @@ public interface Selectable<C, E> {
   // List is unmodifiable and is always valid for the supplied criteria (unenforceable)
   // C and not Predicate because equality semantics for Predicate are not well-defined (caching again)
   public List<E> select(final C criteria);
-
-  /**
-   * Returns an immutable {@link List} of all of this {@link Selectable}'s elements.
-   *
-   * <p>Implementations of this method must be idempotent and must return a determinate value.</p>
-   *
-   * <p>Implementations of this method must not return {@code null}.</p>
-   *
-   * <p>The default implementation of this method calls the {@link #select(Object)} method with {@code null} as the sole
-   * argument.</p>
-   *
-   * @return an immutable {@link List} of all of this {@link Selectable}'s elements; never {@code null}
-   *
-   * @see #select(Object)
-   */
-  public default List<E> list() {
-    return this.select(null);
-  }
 
 }
