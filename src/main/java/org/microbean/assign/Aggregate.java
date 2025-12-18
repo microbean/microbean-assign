@@ -56,9 +56,19 @@ public interface Aggregate {
 
 
   /**
-   * Returns an immutable {@link SequencedSet} of {@link AttributedElement} instances.
+   * Returns an immutable, determinate, {@link SequencedSet} of {@link AttributedElement} instances.
    *
-   * @return an immutable {@link SequencedSet} of {@link AttributedElement} instances; never {@code null}
+   * <p>If an {@link AttributedElement} in the set returns a {@link javax.lang.model.element.TypeElement} from its
+   * {@link AttributedElement#element()} method that represents this {@link Aggregate} implementation, undefined
+   * behavior, including the possibility of infinite loops, may result (an {@link Aggregate} may not have itself as a
+   * dependency).</p>
+   *
+   * <p>Note that it is permissible for an {@link AttributedElement} in the set to refer to another type by returning a
+   * {@link javax.lang.model.element.TypeElement} from its {@link AttributedElement#element()} method.</p>
+   *
+   * <p>The default implementation of this method returns the value of the {@link #EMPTY_DEPENDENCIES} field.</p>
+   *
+   * @return an immutable, determinate, {@link SequencedSet} of {@link AttributedElement} instances; never {@code null}
    *
    * @see AttributedElement
    */
@@ -69,6 +79,10 @@ public interface Aggregate {
   /**
    * A convenience method that assigns a contextual reference to each of this {@link Aggregate}'s {@link
    * AttributedElement} instances and returns the resulting {@link SequencedSet} of {@link Assignment}s.
+   *
+   * <p><strong>Note:</strong> Undefined behavior may result if an {@link AttributedElement} in the {@linkplain
+   * #dependencies() dependencies} represents this {@link Aggregate} implementation (an {@link Aggregate} may not have
+   * itself as a dependency).</p>
    *
    * <p>Typically there is no need to override this method.</p>
    *
@@ -81,6 +95,7 @@ public interface Aggregate {
    *
    * @exception NullPointerException if {@code r} is {@code null}
    */
+  // (Convenience.)
   public default SequencedSet<? extends Assignment<?>> assign(final Function<? super AttributedType, ?> r) {
     final Collection<? extends AttributedElement> ds = this.dependencies();
     if (ds == null || ds.isEmpty()) {
