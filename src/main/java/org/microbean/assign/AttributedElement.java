@@ -35,6 +35,8 @@ import org.microbean.constant.Constables;
 import static java.lang.constant.ConstantDescs.BSM_INVOKE;
 import static java.lang.constant.ConstantDescs.CD_List;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * A pairing of an {@link Element} with a {@link List} of {@link Attributes}s.
  *
@@ -44,7 +46,7 @@ import static java.lang.constant.ConstantDescs.CD_List;
  *
  * @author <a href="https://about.me/lairdnelson/" target="_top">Laird Nelson</a>
  */
-public final record AttributedElement(Element element, List<Attributes> attributes) implements Attributed, Constable {
+public final record AttributedElement(Element element, List<Attributes> attributes) implements Attributed, AttributedTyped, Constable {
 
   /**
    * Creates a new {@link AttributedElement}.
@@ -56,7 +58,7 @@ public final record AttributedElement(Element element, List<Attributes> attribut
    * @exception NullPointerException if either argument is {@code null}
    */
   public AttributedElement {
-    Objects.requireNonNull(element, "element");
+    requireNonNull(element, "element");
     attributes = List.copyOf(attributes);
   }
 
@@ -76,6 +78,7 @@ public final record AttributedElement(Element element, List<Attributes> attribut
    *
    * @see AttributedType
    */
+  @Override // AttributedTyped
   public final AttributedType attributedType() {
     return new AttributedType(this.type(), this.attributes());
   }
