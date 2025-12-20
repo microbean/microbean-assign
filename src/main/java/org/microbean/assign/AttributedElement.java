@@ -20,7 +20,6 @@ import java.lang.constant.DynamicConstantDesc;
 import java.lang.constant.MethodHandleDesc;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.lang.model.element.Element;

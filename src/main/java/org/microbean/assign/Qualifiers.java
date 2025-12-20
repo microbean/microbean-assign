@@ -21,124 +21,45 @@ import java.util.List;
 import org.microbean.attributes.Attributes;
 
 /**
- * A utility class for working with commonly-used <dfn>qualifiers</dfn>.
+ * A utility class for working with <dfn>qualifiers</dfn>.
+ *
+ * <p>This class is currently not used by other classes in this package. It may be useful in a variety of dependency
+ * injection systems.</p>
  *
  * @author <a href="https://about.me/lairdnelson" target="_top">Laird Nelson</a>
  *
  * @see Attributes
  */
-public final class Qualifiers {
+public class Qualifiers {
+
+
+  /*
+   * Static fields.
+   */
+
 
   private static final Attributes QUALIFIER = Attributes.of("Qualifier");
 
   private static final List<Attributes> QUALIFIERS = List.of(QUALIFIER);
 
-  private static final Attributes ANY_QUALIFIER = Attributes.of("Any", QUALIFIERS);
 
-  private static final List<Attributes> ANY_QUALIFIERS = List.of(ANY_QUALIFIER);
+  /*
+   * Constructors.
+   */
 
-  private static final Attributes DEFAULT_QUALIFIER = Attributes.of("Default", QUALIFIERS);
 
-  private static final List<Attributes> DEFAULT_QUALIFIERS = List.of(DEFAULT_QUALIFIER);
-
-  private static final List<Attributes> ANY_AND_DEFAULT_QUALIFIERS = List.of(ANY_QUALIFIER, DEFAULT_QUALIFIER);
-
-  private static final Attributes PRIMORDIAL_QUALIFIER = Attributes.of("Primordial", QUALIFIERS);
-
-  private static final List<Attributes> PRIMORDIAL_QUALIFIERS = List.of(PRIMORDIAL_QUALIFIER);
-
-  private Qualifiers() {
+  /**
+   * Creates a new {@link Qualifiers}.
+   */
+  public Qualifiers() {
     super();
   }
 
-  /**
-   * Returns an unmodifiable {@link List} consisting solely of the unattributed <dfn>any qualifier</dfn> and the
-   * <dfn>default qualifier</dfn>.
-   *
-   * @return an unmodifiable {@link List} consisting solely of the unattributed any qualifier and the default qualifier;
-   * never {@code null}
-   *
-   * @see #anyQualifier()
-   *
-   * @see #defaultQualifier()
-   */
-  public static final List<Attributes> anyAndDefaultQualifiers() {
-    return ANY_AND_DEFAULT_QUALIFIERS;
-  }
 
-  /**
-   * Returns the unattributed <dfn>any qualifier</dfn>.
-   *
-   * @return the <dfn>any qualifier</dfn>; never {@code null}
-   *
-   * @see #anyQualifiers()
+  /*
+   * Instance methods.
    */
-  public static final Attributes anyQualifier() {
-    return ANY_QUALIFIER;
-  }
 
-  /**
-   * Returns {@code true} if and only if the supplied {@link Attributes} {@linkplain Attributes#equals(Object) is equal
-   * to} the unattributed {@linkplain #anyQualifier() any qualifier}.
-   *
-   * @param a an {@link Attributes}; must not be {@code null}
-   *
-   * @return {@code true} if and only if the supplied {@link Attributes} {@linkplain Attributes#equals(Object) is equal
-   * to} the unattributed {@linkplain #anyQualifier() any qualifier}
-   *
-   * @exception NullPointerException if {@code a} is {@code null}
-   */
-  public static final boolean anyQualifier(final Attributes a) {
-    return ANY_QUALIFIER == a || anyQualifier().equals(a) && qualifier(a);
-  }
-
-  /**
-   * Returns an immutable {@link List} consisting solely of the unattributed <dfn>any qualifier</dfn>.
-   *
-   * @return an immutable {@link List}; never {@code null}
-   *
-   * @see #anyQualifier()
-   */
-  public static final List<Attributes> anyQualifiers() {
-    return ANY_QUALIFIERS;
-  }
-
-  /**
-   * Returns the <dfn>default qualifier</dfn>.
-   *
-   * @return the <dfn>default qualifier</dfn>; never {@code null}
-   *
-   * @see #defaultQualifiers()
-   */
-  public static final Attributes defaultQualifier() {
-    return DEFAULT_QUALIFIER;
-  }
-
-  /**
-   * Returns {@code true} if and only if the supplied {@link Attributes} {@linkplain
-   * Attributes#equals(Object) is equal to} the {@linkplain #defaultQualifier() default qualifier}.
-   *
-   * @param a an {@link Attributes}; must not be {@code null}
-   *
-   * @return {@code true} if and only if the supplied {@link Attributes} {@linkplain
-   * Attributes#equals(Object) is equal to} the {@linkplain #defaultQualifier() default qualifier}
-   *
-   * @exception NullPointerException if {@code a} is {@code null}
-   */
-  public static final boolean defaultQualifier(final Attributes a) {
-    return DEFAULT_QUALIFIER == a || defaultQualifier().equals(a) && qualifier(a);
-  }
-
-  /**
-   * Returns an immutable {@link List} consisting solely of the <dfn>default qualifier</dfn>.
-   *
-   * @return an immutable {@link List}; never {@code null}
-   *
-   * @see #defaultQualifier()
-   */
-  public static final List<Attributes> defaultQualifiers() {
-    return DEFAULT_QUALIFIERS;
-  }
 
   /**
    * Returns an {@link Attributes} that is {@linkplain Attributes#equals(Object) equal to} the supplied {@link
@@ -153,11 +74,10 @@ public final class Qualifiers {
    *
    * @exception NullPointerException if {@code a} is {@code null}
    */
-  public static final Attributes normalize(final Attributes a) {
+  public Attributes normalize(final Attributes a) {
     return switch (a) {
     case null -> throw new NullPointerException("a");
-    case Attributes q when defaultQualifier(q) -> defaultQualifier();
-    case Attributes q when QUALIFIER.equals(q) -> qualifier();
+    case Attributes q when this.qualifier().equals(q) -> this.qualifier();
     default -> a;
     };
   }
@@ -175,14 +95,14 @@ public final class Qualifiers {
    *
    * @exception NullPointerException if {@code list} is {@code null}
    */
-  public static final List<Attributes> normalize(final List<Attributes> list) {
+  public List<Attributes> normalize(final List<Attributes> list) {
     return switch (list.size()) {
     case 0 -> List.of();
-    case 1 -> list.equals(defaultQualifiers()) ? defaultQualifiers() : List.copyOf(list);
+    case 1 -> list.equals(this.qualifiers()) ? this.qualifiers() : List.copyOf(list);
     default -> {
       final List<Attributes> l = new ArrayList<>(list.size());
       for (final Attributes a : list) {
-        l.add(normalize(a));
+        l.add(this.normalize(a));
       }
       yield Collections.unmodifiableList(l);
     }
@@ -190,48 +110,11 @@ public final class Qualifiers {
   }
 
   /**
-   * Returns the <dfn>primordial qualifier</dfn>.
-   *
-   * @return the <dfn>primordial qualifier</dfn>; never {@code null}
-   *
-   * @see #primordialQualifiers()
-   */
-  public static final Attributes primordialQualifier() {
-    return PRIMORDIAL_QUALIFIER;
-  }
-
-  /**
-   * Returns {@code true} if and only if the supplied {@link Attributes} {@linkplain
-   * Attributes#equals(Object) is equal to} the {@linkplain #primordialQualifier() primordial qualifier}.
-   *
-   * @param a an {@link Attributes}; must not be {@code null}
-   *
-   * @return {@code true} if and only if the supplied {@link Attributes} {@linkplain
-   * Attributes#equals(Object) is equal to} the {@linkplain #primordialQualifier() primordial qualifier}
-   *
-   * @exception NullPointerException if {@code a} is {@code null}
-   */
-  public static final boolean primordialQualifier(final Attributes a) {
-    return PRIMORDIAL_QUALIFIER == a || primordialQualifier().equals(a) && qualifier(a);
-  }
-
-  /**
-   * Returns an immutable {@link List} consisting solely of the <dfn>primordial qualifier</dfn>.
-   *
-   * @return an immutable {@link List}; never {@code null}
-   *
-   * @see #primordialQualifier()
-   */
-  public static final List<Attributes> primordialQualifiers() {
-    return PRIMORDIAL_QUALIFIERS;
-  }
-
-  /**
    * Returns the <dfn>qualifier</dfn> (meta-) qualifier.
    *
    * @return the <dfn>qualifier</dfn> (meta-) qualifier; never {@code null}
    */
-  public static final Attributes qualifier() {
+  public Attributes qualifier() {
     return QUALIFIER;
   }
 
@@ -246,8 +129,8 @@ public final class Qualifiers {
    *
    * @exception NullPointerException if {@code q} is {@code null}
    */
-  public static final boolean qualifier(final Attributes q) {
-    return q.attributes().contains(qualifier());
+  public boolean qualifier(final Attributes q) {
+    return q.attributes().contains(this.qualifier());
   }
 
   /**
@@ -257,7 +140,7 @@ public final class Qualifiers {
    *
    * @see #qualifier()
    */
-  public static final List<Attributes> qualifiers() {
+  public List<Attributes> qualifiers() {
     return QUALIFIERS;
   }
 
@@ -272,16 +155,14 @@ public final class Qualifiers {
    *
    * @exception NullPointerException if {@code c} is {@code null}
    */
-  public static final List<Attributes> qualifiers(final Collection<? extends Attributes> c) {
+  public List<Attributes> qualifiers(final Collection<? extends Attributes> c) {
     return switch (c) {
     case Collection<?> c0 when c0.isEmpty() -> List.of();
-    case Collection<?> c0 when c0.equals(defaultQualifiers()) -> defaultQualifiers();
-    case Collection<?> c0 when c0.equals(anyAndDefaultQualifiers()) -> anyAndDefaultQualifiers();
-    default ->{
+    default -> {
       final ArrayList<Attributes> list = new ArrayList<>(c.size());
       for (final Attributes a : c) {
-        if (qualifier(a)) {
-          list.add(normalize(a));
+        if (this.qualifier(a)) {
+          list.add(this.normalize(a));
         }
       }
       list.trimToSize();

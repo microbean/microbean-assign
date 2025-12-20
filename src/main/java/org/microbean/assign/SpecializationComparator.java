@@ -14,11 +14,12 @@
 package org.microbean.assign;
 
 import java.util.Comparator;
-import java.util.Objects;
 
 import javax.lang.model.type.TypeMirror;
 
 import org.microbean.construct.Domain;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A {@link Comparator} of {@link TypeMirror}s that establishes a <dfn>partial order</dfn> on its arguments, enforcing
@@ -43,7 +44,7 @@ public final class SpecializationComparator implements Comparator<TypeMirror> {
    */
   public SpecializationComparator(final Domain domain) {
     super();
-    this.domain = Objects.requireNonNull(domain, "domain");
+    this.domain = requireNonNull(domain, "domain");
   }
 
   /**
