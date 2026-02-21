@@ -13,7 +13,7 @@
 <div class="source-container">
 <pre><span class="source-line-no">001</span><span id="line-1">/* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-</span>
 <span class="source-line-no">002</span><span id="line-2"> *</span>
-<span class="source-line-no">003</span><span id="line-3"> * Copyright © 2025 microBean™.</span>
+<span class="source-line-no">003</span><span id="line-3"> * Copyright © 2026 microBean™.</span>
 <span class="source-line-no">004</span><span id="line-4"> *</span>
 <span class="source-line-no">005</span><span id="line-5"> * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with</span>
 <span class="source-line-no">006</span><span id="line-6"> * the License. You may obtain a copy of the License at</span>
@@ -29,97 +29,106 @@
 <span class="source-line-no">016</span><span id="line-16">import java.util.Collection;</span>
 <span class="source-line-no">017</span><span id="line-17">import java.util.SequencedSet;</span>
 <span class="source-line-no">018</span><span id="line-18"></span>
-<span class="source-line-no">019</span><span id="line-19">import java.util.function.Function;</span>
+<span class="source-line-no">019</span><span id="line-19">import javax.lang.model.element.Element;</span>
 <span class="source-line-no">020</span><span id="line-20"></span>
-<span class="source-line-no">021</span><span id="line-21">import static java.util.Collections.unmodifiableSequencedSet;</span>
+<span class="source-line-no">021</span><span id="line-21">import javax.lang.model.AnnotatedConstruct;</span>
 <span class="source-line-no">022</span><span id="line-22"></span>
-<span class="source-line-no">023</span><span id="line-23">import static java.util.LinkedHashSet.newLinkedHashSet;</span>
+<span class="source-line-no">023</span><span id="line-23">import java.util.function.Function;</span>
 <span class="source-line-no">024</span><span id="line-24"></span>
-<span class="source-line-no">025</span><span id="line-25">/**</span>
-<span class="source-line-no">026</span><span id="line-26"> * An object with {@linkplain AttributedElement dependencies}.</span>
-<span class="source-line-no">027</span><span id="line-27"> *</span>
-<span class="source-line-no">028</span><span id="line-28"> * &lt;p&gt;By default, {@link Aggregate}s have {@linkplain #EMPTY_DEPENDENCIES no dependencies}.&lt;/p&gt;</span>
-<span class="source-line-no">029</span><span id="line-29"> *</span>
-<span class="source-line-no">030</span><span id="line-30"> * @author &lt;a href="https://about.me/lairdnelson/" target="_top"&gt;Laird Nelson&lt;/a&gt;</span>
+<span class="source-line-no">025</span><span id="line-25">import static java.util.Collections.unmodifiableSequencedSet;</span>
+<span class="source-line-no">026</span><span id="line-26"></span>
+<span class="source-line-no">027</span><span id="line-27">import static java.util.LinkedHashSet.newLinkedHashSet;</span>
+<span class="source-line-no">028</span><span id="line-28"></span>
+<span class="source-line-no">029</span><span id="line-29">/**</span>
+<span class="source-line-no">030</span><span id="line-30"> * An object with {@linkplain #dependencies() dependencies}.</span>
 <span class="source-line-no">031</span><span id="line-31"> *</span>
-<span class="source-line-no">032</span><span id="line-32"> * @see #dependencies()</span>
-<span class="source-line-no">033</span><span id="line-33"> */</span>
-<span class="source-line-no">034</span><span id="line-34">public interface Aggregate {</span>
-<span class="source-line-no">035</span><span id="line-35"></span>
-<span class="source-line-no">036</span><span id="line-36"></span>
-<span class="source-line-no">037</span><span id="line-37">  /*</span>
-<span class="source-line-no">038</span><span id="line-38">   * Static fields.</span>
-<span class="source-line-no">039</span><span id="line-39">   */</span>
+<span class="source-line-no">032</span><span id="line-32"> * &lt;p&gt;By default, {@link Aggregate}s have {@linkplain #EMPTY_DEPENDENCIES no dependencies}.&lt;/p&gt;</span>
+<span class="source-line-no">033</span><span id="line-33"> *</span>
+<span class="source-line-no">034</span><span id="line-34"> * @author &lt;a href="https://about.me/lairdnelson/" target="_top"&gt;Laird Nelson&lt;/a&gt;</span>
+<span class="source-line-no">035</span><span id="line-35"> *</span>
+<span class="source-line-no">036</span><span id="line-36"> * @see #dependencies()</span>
+<span class="source-line-no">037</span><span id="line-37"> */</span>
+<span class="source-line-no">038</span><span id="line-38">public interface Aggregate {</span>
+<span class="source-line-no">039</span><span id="line-39"></span>
 <span class="source-line-no">040</span><span id="line-40"></span>
-<span class="source-line-no">041</span><span id="line-41"></span>
-<span class="source-line-no">042</span><span id="line-42">  /**</span>
-<span class="source-line-no">043</span><span id="line-43">   * An immutable, empty {@link SequencedSet} of {@link Assignment}s.</span>
-<span class="source-line-no">044</span><span id="line-44">   */</span>
-<span class="source-line-no">045</span><span id="line-45">  public static final SequencedSet&lt;Assignment&lt;?&gt;&gt; EMPTY_ASSIGNMENTS = unmodifiableSequencedSet(newLinkedHashSet(0));</span>
-<span class="source-line-no">046</span><span id="line-46"></span>
-<span class="source-line-no">047</span><span id="line-47">  /**</span>
-<span class="source-line-no">048</span><span id="line-48">   * An immutable, empty {@link SequencedSet} of {@link AttributedElement}s.</span>
-<span class="source-line-no">049</span><span id="line-49">   */</span>
-<span class="source-line-no">050</span><span id="line-50">  public static final SequencedSet&lt;AttributedElement&gt; EMPTY_DEPENDENCIES = unmodifiableSequencedSet(newLinkedHashSet(0));</span>
-<span class="source-line-no">051</span><span id="line-51"></span>
-<span class="source-line-no">052</span><span id="line-52"></span>
-<span class="source-line-no">053</span><span id="line-53">  /*</span>
-<span class="source-line-no">054</span><span id="line-54">   * Default instance methods.</span>
-<span class="source-line-no">055</span><span id="line-55">   */</span>
+<span class="source-line-no">041</span><span id="line-41">  /*</span>
+<span class="source-line-no">042</span><span id="line-42">   * Static fields.</span>
+<span class="source-line-no">043</span><span id="line-43">   */</span>
+<span class="source-line-no">044</span><span id="line-44"></span>
+<span class="source-line-no">045</span><span id="line-45"></span>
+<span class="source-line-no">046</span><span id="line-46">  /**</span>
+<span class="source-line-no">047</span><span id="line-47">   * An immutable, empty {@link SequencedSet} of {@link Assignment}s.</span>
+<span class="source-line-no">048</span><span id="line-48">   */</span>
+<span class="source-line-no">049</span><span id="line-49">  public static final SequencedSet&lt;Assignment&lt;?&gt;&gt; EMPTY_ASSIGNMENTS = unmodifiableSequencedSet(newLinkedHashSet(0));</span>
+<span class="source-line-no">050</span><span id="line-50"></span>
+<span class="source-line-no">051</span><span id="line-51">  /**</span>
+<span class="source-line-no">052</span><span id="line-52">   * An immutable, empty {@link SequencedSet} of {@link Element}s.</span>
+<span class="source-line-no">053</span><span id="line-53">   */</span>
+<span class="source-line-no">054</span><span id="line-54">  public static final SequencedSet&lt;Annotated&lt;Element&gt;&gt; EMPTY_DEPENDENCIES = unmodifiableSequencedSet(newLinkedHashSet(0));</span>
+<span class="source-line-no">055</span><span id="line-55"></span>
 <span class="source-line-no">056</span><span id="line-56"></span>
-<span class="source-line-no">057</span><span id="line-57"></span>
-<span class="source-line-no">058</span><span id="line-58">  /**</span>
-<span class="source-line-no">059</span><span id="line-59">   * Returns an immutable, determinate, {@link SequencedSet} of {@link AttributedElement} instances.</span>
-<span class="source-line-no">060</span><span id="line-60">   *</span>
-<span class="source-line-no">061</span><span id="line-61">   * &lt;p&gt;If an {@link AttributedElement} in the set returns a {@link javax.lang.model.element.TypeElement} from its</span>
-<span class="source-line-no">062</span><span id="line-62">   * {@link AttributedElement#element()} method that represents this {@link Aggregate} implementation, undefined</span>
-<span class="source-line-no">063</span><span id="line-63">   * behavior, including the possibility of infinite loops, may result (an {@link Aggregate} may not have itself as a</span>
-<span class="source-line-no">064</span><span id="line-64">   * dependency).&lt;/p&gt;</span>
+<span class="source-line-no">057</span><span id="line-57">  /*</span>
+<span class="source-line-no">058</span><span id="line-58">   * Default instance methods.</span>
+<span class="source-line-no">059</span><span id="line-59">   */</span>
+<span class="source-line-no">060</span><span id="line-60"></span>
+<span class="source-line-no">061</span><span id="line-61"></span>
+<span class="source-line-no">062</span><span id="line-62">  /**</span>
+<span class="source-line-no">063</span><span id="line-63">   * Returns an immutable, determinate, {@link SequencedSet} of {@link Annotated Annotated&amp;lt;? extends Element&amp;gt;}</span>
+<span class="source-line-no">064</span><span id="line-64">   * instances.</span>
 <span class="source-line-no">065</span><span id="line-65">   *</span>
-<span class="source-line-no">066</span><span id="line-66">   * &lt;p&gt;Note that it is permissible for an {@link AttributedElement} in the set to refer to another type by returning a</span>
-<span class="source-line-no">067</span><span id="line-67">   * {@link javax.lang.model.element.TypeElement} from its {@link AttributedElement#element()} method.&lt;/p&gt;</span>
-<span class="source-line-no">068</span><span id="line-68">   *</span>
-<span class="source-line-no">069</span><span id="line-69">   * &lt;p&gt;The default implementation of this method returns the value of the {@link #EMPTY_DEPENDENCIES} field.&lt;/p&gt;</span>
-<span class="source-line-no">070</span><span id="line-70">   *</span>
-<span class="source-line-no">071</span><span id="line-71">   * @return an immutable, determinate, {@link SequencedSet} of {@link AttributedElement} instances; never {@code null}</span>
+<span class="source-line-no">066</span><span id="line-66">   * &lt;p&gt;If an {@link Annotated Annotated&amp;lt;? extends Element&amp;gt;} in the set represents this very {@link Aggregate}</span>
+<span class="source-line-no">067</span><span id="line-67">   * implementation, undefined behavior, including the possibility of infinite loops, may result (an {@link Aggregate}</span>
+<span class="source-line-no">068</span><span id="line-68">   * may not have itself as a dependency).&lt;/p&gt;</span>
+<span class="source-line-no">069</span><span id="line-69">   *</span>
+<span class="source-line-no">070</span><span id="line-70">   * &lt;p&gt;Note that it is permissible for an {@link Annotated Annotated&amp;lt;? extends Element&amp;gt;} in the set to represent</span>
+<span class="source-line-no">071</span><span id="line-71">   * another type.&lt;/p&gt;</span>
 <span class="source-line-no">072</span><span id="line-72">   *</span>
-<span class="source-line-no">073</span><span id="line-73">   * @see AttributedElement</span>
-<span class="source-line-no">074</span><span id="line-74">   */</span>
-<span class="source-line-no">075</span><span id="line-75">  public default SequencedSet&lt;AttributedElement&gt; dependencies() {</span>
-<span class="source-line-no">076</span><span id="line-76">    return EMPTY_DEPENDENCIES;</span>
-<span class="source-line-no">077</span><span id="line-77">  }</span>
-<span class="source-line-no">078</span><span id="line-78"></span>
-<span class="source-line-no">079</span><span id="line-79">  /**</span>
-<span class="source-line-no">080</span><span id="line-80">   * A convenience method that assigns a contextual reference to each of this {@link Aggregate}'s {@link</span>
-<span class="source-line-no">081</span><span id="line-81">   * AttributedElement} instances and returns the resulting {@link SequencedSet} of {@link Assignment}s.</span>
-<span class="source-line-no">082</span><span id="line-82">   *</span>
-<span class="source-line-no">083</span><span id="line-83">   * &lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; Undefined behavior may result if an {@link AttributedElement} in the {@linkplain</span>
-<span class="source-line-no">084</span><span id="line-84">   * #dependencies() dependencies} represents this {@link Aggregate} implementation (an {@link Aggregate} may not have</span>
-<span class="source-line-no">085</span><span id="line-85">   * itself as a dependency).&lt;/p&gt;</span>
-<span class="source-line-no">086</span><span id="line-86">   *</span>
-<span class="source-line-no">087</span><span id="line-87">   * &lt;p&gt;Typically there is no need to override this method.&lt;/p&gt;</span>
-<span class="source-line-no">088</span><span id="line-88">   *</span>
-<span class="source-line-no">089</span><span id="line-89">   * &lt;p&gt;Usage of this method is not required.&lt;/p&gt;</span>
+<span class="source-line-no">073</span><span id="line-73">   * &lt;p&gt;The default implementation of this method returns the value of the {@link #EMPTY_DEPENDENCIES} field.&lt;/p&gt;</span>
+<span class="source-line-no">074</span><span id="line-74">   *</span>
+<span class="source-line-no">075</span><span id="line-75">   * @return an immutable, determinate, {@link SequencedSet} of {@link Annotated Annotated&amp;lt;? extends Element&amp;gt;}</span>
+<span class="source-line-no">076</span><span id="line-76">   * instances; never {@code null}</span>
+<span class="source-line-no">077</span><span id="line-77">   *</span>
+<span class="source-line-no">078</span><span id="line-78">   * @see Annotated</span>
+<span class="source-line-no">079</span><span id="line-79">   *</span>
+<span class="source-line-no">080</span><span id="line-80">   * @see Annotated#of(AnnotatedConstruct)</span>
+<span class="source-line-no">081</span><span id="line-81">   */</span>
+<span class="source-line-no">082</span><span id="line-82">  public default SequencedSet&lt;? extends Annotated&lt;? extends Element&gt;&gt; dependencies() {</span>
+<span class="source-line-no">083</span><span id="line-83">    return EMPTY_DEPENDENCIES;</span>
+<span class="source-line-no">084</span><span id="line-84">  }</span>
+<span class="source-line-no">085</span><span id="line-85"></span>
+<span class="source-line-no">086</span><span id="line-86">  /**</span>
+<span class="source-line-no">087</span><span id="line-87">   * A convenience method that assigns a contextual reference to each of this {@link Aggregate}'s {@link Annotated</span>
+<span class="source-line-no">088</span><span id="line-88">   * Annotated&amp;lt;? extends Element&amp;gt;}-typed {@linkplain #dependencies() dependencies} and returns the resulting</span>
+<span class="source-line-no">089</span><span id="line-89">   * {@link SequencedSet} of {@link Assignment}s.</span>
 <span class="source-line-no">090</span><span id="line-90">   *</span>
-<span class="source-line-no">091</span><span id="line-91">   * @param r a {@link Function} that retrieves a contextual reference suitable for an {@link AttributedType}; if {@link</span>
-<span class="source-line-no">092</span><span id="line-92">   * #dependencies()} returns a non-empty {@link SequencedSet} then this argument must not be {@code null}</span>
-<span class="source-line-no">093</span><span id="line-93">   *</span>
-<span class="source-line-no">094</span><span id="line-94">   * @return an immutable {@link SequencedSet} of {@link Assignment} instances; never {@code null}</span>
-<span class="source-line-no">095</span><span id="line-95">   *</span>
-<span class="source-line-no">096</span><span id="line-96">   * @exception NullPointerException if {@code r} is {@code null}</span>
-<span class="source-line-no">097</span><span id="line-97">   */</span>
-<span class="source-line-no">098</span><span id="line-98">  // (Convenience.)</span>
-<span class="source-line-no">099</span><span id="line-99">  public default SequencedSet&lt;? extends Assignment&lt;?&gt;&gt; assign(final Function&lt;? super AttributedType, ?&gt; r) {</span>
-<span class="source-line-no">100</span><span id="line-100">    final Collection&lt;? extends AttributedElement&gt; ds = this.dependencies();</span>
-<span class="source-line-no">101</span><span id="line-101">    if (ds == null || ds.isEmpty()) {</span>
-<span class="source-line-no">102</span><span id="line-102">      return EMPTY_ASSIGNMENTS;</span>
-<span class="source-line-no">103</span><span id="line-103">    }</span>
-<span class="source-line-no">104</span><span id="line-104">    final SequencedSet&lt;Assignment&lt;?&gt;&gt; assignments = newLinkedHashSet(ds.size());</span>
-<span class="source-line-no">105</span><span id="line-105">    ds.forEach(d -&gt; assignments.add(new Assignment&lt;&gt;(d, r.apply(d.attributedType()))));</span>
-<span class="source-line-no">106</span><span id="line-106">    return unmodifiableSequencedSet(assignments);</span>
-<span class="source-line-no">107</span><span id="line-107">  }</span>
-<span class="source-line-no">108</span><span id="line-108"></span>
-<span class="source-line-no">109</span><span id="line-109">}</span>
+<span class="source-line-no">091</span><span id="line-91">   * &lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; Undefined behavior may result if an {@link Annotated Annotated&amp;lt;? extends Element&amp;gt;}</span>
+<span class="source-line-no">092</span><span id="line-92">   * in the {@linkplain #dependencies() dependencies} represents this {@link Aggregate} implementation (an {@link</span>
+<span class="source-line-no">093</span><span id="line-93">   * Aggregate} may not have itself as a dependency).&lt;/p&gt;</span>
+<span class="source-line-no">094</span><span id="line-94">   *</span>
+<span class="source-line-no">095</span><span id="line-95">   * &lt;p&gt;Typically there is no need to override this method.&lt;/p&gt;</span>
+<span class="source-line-no">096</span><span id="line-96">   *</span>
+<span class="source-line-no">097</span><span id="line-97">   * &lt;p&gt;Usage of this method is not required.&lt;/p&gt;</span>
+<span class="source-line-no">098</span><span id="line-98">   *</span>
+<span class="source-line-no">099</span><span id="line-99">   * @param r a {@link Function} that retrieves a contextual reference suitable for an {@link Annotated Annotated&amp;lt;?</span>
+<span class="source-line-no">100</span><span id="line-100">   * extends AnnotatedConstruct&amp;gt;}; if {@link #dependencies()} returns a non-empty {@link SequencedSet} then this</span>
+<span class="source-line-no">101</span><span id="line-101">   * argument must not be {@code null}</span>
+<span class="source-line-no">102</span><span id="line-102">   *</span>
+<span class="source-line-no">103</span><span id="line-103">   * @return an immutable {@link SequencedSet} of {@link Assignment} instances; never {@code null}</span>
+<span class="source-line-no">104</span><span id="line-104">   *</span>
+<span class="source-line-no">105</span><span id="line-105">   * @exception NullPointerException if {@code r} is {@code null}</span>
+<span class="source-line-no">106</span><span id="line-106">   */</span>
+<span class="source-line-no">107</span><span id="line-107">  // (Convenience.)</span>
+<span class="source-line-no">108</span><span id="line-108">  public default SequencedSet&lt;? extends Assignment&lt;?&gt;&gt; assign(final Function&lt;? super Annotated&lt;? extends AnnotatedConstruct&gt;, ?&gt; r) {</span>
+<span class="source-line-no">109</span><span id="line-109">    final Collection&lt;? extends Annotated&lt;? extends Element&gt;&gt; ds = this.dependencies();</span>
+<span class="source-line-no">110</span><span id="line-110">    if (ds == null || ds.isEmpty()) {</span>
+<span class="source-line-no">111</span><span id="line-111">      return EMPTY_ASSIGNMENTS;</span>
+<span class="source-line-no">112</span><span id="line-112">    }</span>
+<span class="source-line-no">113</span><span id="line-113">    final SequencedSet&lt;Assignment&lt;?&gt;&gt; assignments = newLinkedHashSet(ds.size());</span>
+<span class="source-line-no">114</span><span id="line-114">    ds.forEach(d -&gt; assignments.add(new Assignment&lt;&gt;(d, r.apply(d))));</span>
+<span class="source-line-no">115</span><span id="line-115">    return unmodifiableSequencedSet(assignments);</span>
+<span class="source-line-no">116</span><span id="line-116">  }</span>
+<span class="source-line-no">117</span><span id="line-117"></span>
+<span class="source-line-no">118</span><span id="line-118">}</span>
 
 
 

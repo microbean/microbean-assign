@@ -13,7 +13,7 @@
 <div class="source-container">
 <pre><span class="source-line-no">001</span><span id="line-1">/* -*- mode: Java; c-basic-offset: 2; indent-tabs-mode: nil; coding: utf-8-unix -*-</span>
 <span class="source-line-no">002</span><span id="line-2"> *</span>
-<span class="source-line-no">003</span><span id="line-3"> * Copyright © 2025 microBean™.</span>
+<span class="source-line-no">003</span><span id="line-3"> * Copyright © 2025–2026 microBean™.</span>
 <span class="source-line-no">004</span><span id="line-4"> *</span>
 <span class="source-line-no">005</span><span id="line-5"> * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with</span>
 <span class="source-line-no">006</span><span id="line-6"> * the License. You may obtain a copy of the License at</span>
@@ -26,131 +26,230 @@
 <span class="source-line-no">013</span><span id="line-13"> */</span>
 <span class="source-line-no">014</span><span id="line-14">package org.microbean.assign;</span>
 <span class="source-line-no">015</span><span id="line-15"></span>
-<span class="source-line-no">016</span><span id="line-16">import java.util.Collection;</span>
-<span class="source-line-no">017</span><span id="line-17">import java.util.List;</span>
-<span class="source-line-no">018</span><span id="line-18">import java.util.Map;</span>
-<span class="source-line-no">019</span><span id="line-19">import java.util.Objects;</span>
-<span class="source-line-no">020</span><span id="line-20"></span>
-<span class="source-line-no">021</span><span id="line-21">import java.util.concurrent.ConcurrentHashMap;</span>
-<span class="source-line-no">022</span><span id="line-22"></span>
-<span class="source-line-no">023</span><span id="line-23">import java.util.function.BiFunction;</span>
-<span class="source-line-no">024</span><span id="line-24">import java.util.function.BiPredicate;</span>
-<span class="source-line-no">025</span><span id="line-25">import java.util.function.Function;</span>
-<span class="source-line-no">026</span><span id="line-26"></span>
-<span class="source-line-no">027</span><span id="line-27">/**</span>
-<span class="source-line-no">028</span><span id="line-28"> * Utility methods for working with {@link Selectable}s.</span>
-<span class="source-line-no">029</span><span id="line-29"> *</span>
-<span class="source-line-no">030</span><span id="line-30"> * @author &lt;a href="https://about.me/lairdnelson" target="_top"&gt;Laird Nelson&lt;/a&gt;</span>
-<span class="source-line-no">031</span><span id="line-31"> *</span>
-<span class="source-line-no">032</span><span id="line-32"> * @see Selectable</span>
-<span class="source-line-no">033</span><span id="line-33"> */</span>
-<span class="source-line-no">034</span><span id="line-34">public final class Selectables {</span>
-<span class="source-line-no">035</span><span id="line-35"></span>
-<span class="source-line-no">036</span><span id="line-36">  private Selectables() {</span>
-<span class="source-line-no">037</span><span id="line-37">    super();</span>
-<span class="source-line-no">038</span><span id="line-38">  }</span>
-<span class="source-line-no">039</span><span id="line-39">  </span>
-<span class="source-line-no">040</span><span id="line-40">  /**</span>
-<span class="source-line-no">041</span><span id="line-41">   * Returns a {@link Selectable} that caches its results.</span>
-<span class="source-line-no">042</span><span id="line-42">   *</span>
-<span class="source-line-no">043</span><span id="line-43">   * &lt;p&gt;The cache is unbounded.&lt;/p&gt;</span>
-<span class="source-line-no">044</span><span id="line-44">   *</span>
-<span class="source-line-no">045</span><span id="line-45">   * @param &lt;C&gt; the criteria type</span>
-<span class="source-line-no">046</span><span id="line-46">   *</span>
-<span class="source-line-no">047</span><span id="line-47">   * @param &lt;E&gt; the element type</span>
-<span class="source-line-no">048</span><span id="line-48">   *</span>
-<span class="source-line-no">049</span><span id="line-49">   * @param selectable a {@link Selectable}; must not be {@code null}</span>
-<span class="source-line-no">050</span><span id="line-50">   *</span>
-<span class="source-line-no">051</span><span id="line-51">   * @return a non-{@code null} {@link Selectable}</span>
+<span class="source-line-no">016</span><span id="line-16">import java.util.ArrayList;</span>
+<span class="source-line-no">017</span><span id="line-17">import java.util.Collection;</span>
+<span class="source-line-no">018</span><span id="line-18">import java.util.List;</span>
+<span class="source-line-no">019</span><span id="line-19">import java.util.Map;</span>
+<span class="source-line-no">020</span><span id="line-20">import java.util.Objects;</span>
+<span class="source-line-no">021</span><span id="line-21"></span>
+<span class="source-line-no">022</span><span id="line-22">import java.util.concurrent.ConcurrentHashMap;</span>
+<span class="source-line-no">023</span><span id="line-23"></span>
+<span class="source-line-no">024</span><span id="line-24">import java.util.function.BiFunction;</span>
+<span class="source-line-no">025</span><span id="line-25">import java.util.function.BiPredicate;</span>
+<span class="source-line-no">026</span><span id="line-26">import java.util.function.Function;</span>
+<span class="source-line-no">027</span><span id="line-27">import java.util.function.Predicate;</span>
+<span class="source-line-no">028</span><span id="line-28"></span>
+<span class="source-line-no">029</span><span id="line-29">import javax.lang.model.AnnotatedConstruct;</span>
+<span class="source-line-no">030</span><span id="line-30"></span>
+<span class="source-line-no">031</span><span id="line-31">import javax.lang.model.element.AnnotationMirror;</span>
+<span class="source-line-no">032</span><span id="line-32">import javax.lang.model.element.Element;</span>
+<span class="source-line-no">033</span><span id="line-33">import javax.lang.model.element.ExecutableElement;</span>
+<span class="source-line-no">034</span><span id="line-34"></span>
+<span class="source-line-no">035</span><span id="line-35">import static java.util.Objects.requireNonNull;</span>
+<span class="source-line-no">036</span><span id="line-36"></span>
+<span class="source-line-no">037</span><span id="line-37">/**</span>
+<span class="source-line-no">038</span><span id="line-38"> * Utility methods for working with {@link Selectable}s.</span>
+<span class="source-line-no">039</span><span id="line-39"> *</span>
+<span class="source-line-no">040</span><span id="line-40"> * @author &lt;a href="https://about.me/lairdnelson" target="_top"&gt;Laird Nelson&lt;/a&gt;</span>
+<span class="source-line-no">041</span><span id="line-41"> *</span>
+<span class="source-line-no">042</span><span id="line-42"> * @see Selectable</span>
+<span class="source-line-no">043</span><span id="line-43"> */</span>
+<span class="source-line-no">044</span><span id="line-44">public final class Selectables {</span>
+<span class="source-line-no">045</span><span id="line-45"></span>
+<span class="source-line-no">046</span><span id="line-46">  private Selectables() {</span>
+<span class="source-line-no">047</span><span id="line-47">    super();</span>
+<span class="source-line-no">048</span><span id="line-48">  }</span>
+<span class="source-line-no">049</span><span id="line-49"></span>
+<span class="source-line-no">050</span><span id="line-50">  /**</span>
+<span class="source-line-no">051</span><span id="line-51">   * Returns a {@link Selectable} that caches its results.</span>
 <span class="source-line-no">052</span><span id="line-52">   *</span>
-<span class="source-line-no">053</span><span id="line-53">   * @exception NullPointerException if {@code selectable} is {@code null}</span>
+<span class="source-line-no">053</span><span id="line-53">   * &lt;p&gt;The cache is unbounded.&lt;/p&gt;</span>
 <span class="source-line-no">054</span><span id="line-54">   *</span>
-<span class="source-line-no">055</span><span id="line-55">   * @see #caching(Selectable, BiFunction)</span>
-<span class="source-line-no">056</span><span id="line-56">   */</span>
-<span class="source-line-no">057</span><span id="line-57">  public static &lt;C, E&gt; Selectable&lt;C, E&gt; caching(final Selectable&lt;C, E&gt; selectable) {</span>
-<span class="source-line-no">058</span><span id="line-58">    final Map&lt;C, List&lt;E&gt;&gt; selectionCache = new ConcurrentHashMap&lt;&gt;();</span>
-<span class="source-line-no">059</span><span id="line-59">    return Selectables.&lt;C, E&gt;caching(selectable, selectionCache::computeIfAbsent);</span>
-<span class="source-line-no">060</span><span id="line-60">  }</span>
-<span class="source-line-no">061</span><span id="line-61"></span>
-<span class="source-line-no">062</span><span id="line-62">  /**</span>
-<span class="source-line-no">063</span><span id="line-63">   * Returns a {@link Selectable} that caches its results.</span>
+<span class="source-line-no">055</span><span id="line-55">   * @param &lt;C&gt; the criteria type</span>
+<span class="source-line-no">056</span><span id="line-56">   *</span>
+<span class="source-line-no">057</span><span id="line-57">   * @param &lt;E&gt; the element type</span>
+<span class="source-line-no">058</span><span id="line-58">   *</span>
+<span class="source-line-no">059</span><span id="line-59">   * @param selectable a {@link Selectable}; must not be {@code null}</span>
+<span class="source-line-no">060</span><span id="line-60">   *</span>
+<span class="source-line-no">061</span><span id="line-61">   * @return a non-{@code null} {@link Selectable}</span>
+<span class="source-line-no">062</span><span id="line-62">   *</span>
+<span class="source-line-no">063</span><span id="line-63">   * @exception NullPointerException if {@code selectable} is {@code null}</span>
 <span class="source-line-no">064</span><span id="line-64">   *</span>
-<span class="source-line-no">065</span><span id="line-65">   * @param &lt;C&gt; the criteria type</span>
-<span class="source-line-no">066</span><span id="line-66">   *</span>
-<span class="source-line-no">067</span><span id="line-67">   * @param &lt;E&gt; the element type</span>
-<span class="source-line-no">068</span><span id="line-68">   *</span>
-<span class="source-line-no">069</span><span id="line-69">   * @param selectable a {@link Selectable}; must not be {@code null}</span>
-<span class="source-line-no">070</span><span id="line-70">   *</span>
-<span class="source-line-no">071</span><span id="line-71">   * @param f a {@link BiFunction} that returns a cached result, computing it on demand via its supplied mapping {@link</span>
-<span class="source-line-no">072</span><span id="line-72">   * Function} if necessary; must not be {@code null}; normally safe for concurrent use by multiple threads; often a</span>
-<span class="source-line-no">073</span><span id="line-73">   * reference to the {@link ConcurrentHashMap#computeIfAbsent(Object, Function)} method</span>
+<span class="source-line-no">065</span><span id="line-65">   * @see #caching(Selectable, BiFunction)</span>
+<span class="source-line-no">066</span><span id="line-66">   */</span>
+<span class="source-line-no">067</span><span id="line-67">  public static &lt;C, E&gt; Selectable&lt;C, E&gt; caching(final Selectable&lt;? super C, E&gt; selectable) {</span>
+<span class="source-line-no">068</span><span id="line-68">    final Map&lt;C, List&lt;E&gt;&gt; selectionCache = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="source-line-no">069</span><span id="line-69">    return Selectables.&lt;C, E&gt;caching(selectable, selectionCache::computeIfAbsent);</span>
+<span class="source-line-no">070</span><span id="line-70">  }</span>
+<span class="source-line-no">071</span><span id="line-71"></span>
+<span class="source-line-no">072</span><span id="line-72">  /**</span>
+<span class="source-line-no">073</span><span id="line-73">   * Returns a {@link Selectable} that caches its results.</span>
 <span class="source-line-no">074</span><span id="line-74">   *</span>
-<span class="source-line-no">075</span><span id="line-75">   * @return a non-{@code null} {@link Selectable}</span>
+<span class="source-line-no">075</span><span id="line-75">   * @param &lt;C&gt; the criteria type</span>
 <span class="source-line-no">076</span><span id="line-76">   *</span>
-<span class="source-line-no">077</span><span id="line-77">   * @exception NullPointerException if {@code selectable} or {@code f} is {@code null}</span>
+<span class="source-line-no">077</span><span id="line-77">   * @param &lt;E&gt; the element type</span>
 <span class="source-line-no">078</span><span id="line-78">   *</span>
-<span class="source-line-no">079</span><span id="line-79">   * @see ConcurrentHashMap#computeIfAbsent(Object, Function)</span>
-<span class="source-line-no">080</span><span id="line-80">   */</span>
-<span class="source-line-no">081</span><span id="line-81">  public static &lt;C, E&gt; Selectable&lt;C, E&gt; caching(final Selectable&lt;C, E&gt; selectable,</span>
-<span class="source-line-no">082</span><span id="line-82">                                                final BiFunction&lt;? super C, Function&lt;? super C, ? extends List&lt;E&gt;&gt;, ? extends List&lt;E&gt;&gt; f) {</span>
-<span class="source-line-no">083</span><span id="line-83">    return c -&gt; f.apply(c, selectable::select);</span>
-<span class="source-line-no">084</span><span id="line-84">  }</span>
-<span class="source-line-no">085</span><span id="line-85"></span>
-<span class="source-line-no">086</span><span id="line-86">  /**</span>
-<span class="source-line-no">087</span><span id="line-87">   * Returns a {@link Selectable} whose {@link Selectable#select(Object)} method always returns an {@linkplain List#of()</span>
-<span class="source-line-no">088</span><span id="line-88">   * empty, immutable &lt;code&gt;List&lt;/code&gt;}.</span>
-<span class="source-line-no">089</span><span id="line-89">   *</span>
-<span class="source-line-no">090</span><span id="line-90">   * &lt;p&gt;This method is useful primarily for completeness and for testing pathological situations.&lt;/p&gt;</span>
-<span class="source-line-no">091</span><span id="line-91">   *</span>
-<span class="source-line-no">092</span><span id="line-92">   * @param &lt;C&gt; the criteria type</span>
-<span class="source-line-no">093</span><span id="line-93">   *</span>
-<span class="source-line-no">094</span><span id="line-94">   * @param &lt;E&gt; the element type</span>
-<span class="source-line-no">095</span><span id="line-95">   *</span>
-<span class="source-line-no">096</span><span id="line-96">   * @return a non-{@code null} {@link Selectable}</span>
-<span class="source-line-no">097</span><span id="line-97">   */</span>
-<span class="source-line-no">098</span><span id="line-98">  public static final &lt;C, E&gt; Selectable&lt;C, E&gt; empty() {</span>
-<span class="source-line-no">099</span><span id="line-99">    return Selectables::empty;</span>
-<span class="source-line-no">100</span><span id="line-100">  }</span>
-<span class="source-line-no">101</span><span id="line-101"></span>
-<span class="source-line-no">102</span><span id="line-102">  private static final &lt;C, E&gt; List&lt;E&gt; empty(final C ignored) {</span>
-<span class="source-line-no">103</span><span id="line-103">    return List.of();</span>
-<span class="source-line-no">104</span><span id="line-104">  }</span>
-<span class="source-line-no">105</span><span id="line-105"></span>
-<span class="source-line-no">106</span><span id="line-106">  /**</span>
-<span class="source-line-no">107</span><span id="line-107">   * Returns a {@link Selectable} using the supplied {@link Collection} as its elements, and the supplied {@link</span>
-<span class="source-line-no">108</span><span id="line-108">   * BiPredicate} as its &lt;em&gt;selector&lt;/em&gt;.</span>
+<span class="source-line-no">079</span><span id="line-79">   * @param selectable a {@link Selectable}; must not be {@code null}</span>
+<span class="source-line-no">080</span><span id="line-80">   *</span>
+<span class="source-line-no">081</span><span id="line-81">   * @param f a {@link BiFunction} that returns a cached result, computing it on demand via its supplied mapping {@link</span>
+<span class="source-line-no">082</span><span id="line-82">   * Function} if necessary; must not be {@code null}; normally safe for concurrent use by multiple threads; often a</span>
+<span class="source-line-no">083</span><span id="line-83">   * reference to the {@link ConcurrentHashMap#computeIfAbsent(Object, Function)} method</span>
+<span class="source-line-no">084</span><span id="line-84">   *</span>
+<span class="source-line-no">085</span><span id="line-85">   * @return a non-{@code null} {@link Selectable}</span>
+<span class="source-line-no">086</span><span id="line-86">   *</span>
+<span class="source-line-no">087</span><span id="line-87">   * @exception NullPointerException if {@code selectable} or {@code f} is {@code null}</span>
+<span class="source-line-no">088</span><span id="line-88">   *</span>
+<span class="source-line-no">089</span><span id="line-89">   * @see ConcurrentHashMap#computeIfAbsent(Object, Function)</span>
+<span class="source-line-no">090</span><span id="line-90">   */</span>
+<span class="source-line-no">091</span><span id="line-91">  public static &lt;C, E&gt; Selectable&lt;C, E&gt; caching(final Selectable&lt;? super C, E&gt; selectable,</span>
+<span class="source-line-no">092</span><span id="line-92">                                                final BiFunction&lt;? super C, Function&lt;? super C, ? extends List&lt;E&gt;&gt;, ? extends List&lt;E&gt;&gt; f) {</span>
+<span class="source-line-no">093</span><span id="line-93">    return c -&gt; f.apply(c, selectable::select);</span>
+<span class="source-line-no">094</span><span id="line-94">  }</span>
+<span class="source-line-no">095</span><span id="line-95">  </span>
+<span class="source-line-no">096</span><span id="line-96">  /**</span>
+<span class="source-line-no">097</span><span id="line-97">   * An &lt;strong&gt;experimental&lt;/strong&gt; method that converts a {@link Selectable} accepting {@link Annotated</span>
+<span class="source-line-no">098</span><span id="line-98">   * Annotated&amp;lt;AnnotatedConstruct&amp;gt;} instances into a {@link Selectable} accepting {@link AnnotatedConstruct}</span>
+<span class="source-line-no">099</span><span id="line-99">   * instances.</span>
+<span class="source-line-no">100</span><span id="line-100">   *</span>
+<span class="source-line-no">101</span><span id="line-101">   * @param &lt;C&gt; the criteria type</span>
+<span class="source-line-no">102</span><span id="line-102">   *</span>
+<span class="source-line-no">103</span><span id="line-103">   * @param &lt;E&gt; the element type</span>
+<span class="source-line-no">104</span><span id="line-104">   *</span>
+<span class="source-line-no">105</span><span id="line-105">   * @param s a non-{@code null} {@link Selectable} accepting {@link Annotated Annotated&amp;lt;AnnotatedConstruct&amp;gt;}</span>
+<span class="source-line-no">106</span><span id="line-106">   * instances</span>
+<span class="source-line-no">107</span><span id="line-107">   *</span>
+<span class="source-line-no">108</span><span id="line-108">   * @return a non-{@code null}, determinate {@link Selectable} accepting {@link AnnotatedConstruct} instances</span>
 <span class="source-line-no">109</span><span id="line-109">   *</span>
-<span class="source-line-no">110</span><span id="line-110">   * &lt;p&gt;There is no guarantee that this method will return new {@link Selectable} instances.&lt;/p&gt;</span>
+<span class="source-line-no">110</span><span id="line-110">   * @exception NullPointerException if {@code s} is {@code null}</span>
 <span class="source-line-no">111</span><span id="line-111">   *</span>
-<span class="source-line-no">112</span><span id="line-112">   * &lt;p&gt;The {@link Selectable} instances returned by this method may or may not cache their selections.&lt;/p&gt;</span>
+<span class="source-line-no">112</span><span id="line-112">   * @see #convert(Selectable, Predicate)</span>
 <span class="source-line-no">113</span><span id="line-113">   *</span>
-<span class="source-line-no">114</span><span id="line-114">   * &lt;p&gt;The selector must (indirectly) designate a sublist from the supplied {@link Collection} as mediated by the</span>
-<span class="source-line-no">115</span><span id="line-115">   * supplied criteria. The selector must additionally be idempotent and must produce a determinate value when given the</span>
-<span class="source-line-no">116</span><span id="line-116">   * same arguments.&lt;/p&gt;</span>
-<span class="source-line-no">117</span><span id="line-117">   *</span>
-<span class="source-line-no">118</span><span id="line-118">   * &lt;p&gt;No validation of these semantics of the selector is performed.&lt;/p&gt;</span>
-<span class="source-line-no">119</span><span id="line-119">   *</span>
-<span class="source-line-no">120</span><span id="line-120">   * @param &lt;C&gt; the criteria type</span>
-<span class="source-line-no">121</span><span id="line-121">   *</span>
-<span class="source-line-no">122</span><span id="line-122">   * @param &lt;E&gt; the element type</span>
-<span class="source-line-no">123</span><span id="line-123">   *</span>
-<span class="source-line-no">124</span><span id="line-124">   * @param collection a {@link Collection} of elements from which sublists may be selected; must not be {@code null}</span>
-<span class="source-line-no">125</span><span id="line-125">   *</span>
-<span class="source-line-no">126</span><span id="line-126">   * @param p the selector; must not be {@code null}</span>
+<span class="source-line-no">114</span><span id="line-114">   * @see Annotated</span>
+<span class="source-line-no">115</span><span id="line-115">   *</span>
+<span class="source-line-no">116</span><span id="line-116">   * @see AnnotatedConstruct</span>
+<span class="source-line-no">117</span><span id="line-117">   */</span>
+<span class="source-line-no">118</span><span id="line-118">  @Deprecated(forRemoval = true) // Annotated.of(AnnotatedConstruct) exists</span>
+<span class="source-line-no">119</span><span id="line-119">  public static &lt;C extends AnnotatedConstruct, E&gt; Selectable&lt;C, E&gt; convert(final Selectable&lt;? super Annotated&lt;C&gt;, E&gt; s) {</span>
+<span class="source-line-no">120</span><span id="line-120">    return convert(s, null);</span>
+<span class="source-line-no">121</span><span id="line-121">  }</span>
+<span class="source-line-no">122</span><span id="line-122">  </span>
+<span class="source-line-no">123</span><span id="line-123">  /**</span>
+<span class="source-line-no">124</span><span id="line-124">   * An &lt;strong&gt;experimental&lt;/strong&gt; method that converts a {@link Selectable} accepting {@link Annotated</span>
+<span class="source-line-no">125</span><span id="line-125">   * Annotated&amp;lt;AnnotatedConstruct&amp;gt;} instances into a {@link Selectable} accepting {@link AnnotatedConstruct}</span>
+<span class="source-line-no">126</span><span id="line-126">   * instances.</span>
 <span class="source-line-no">127</span><span id="line-127">   *</span>
-<span class="source-line-no">128</span><span id="line-128">   * @return a {@link Selectable}; never {@code null}</span>
+<span class="source-line-no">128</span><span id="line-128">   * @param &lt;C&gt; the criteria type</span>
 <span class="source-line-no">129</span><span id="line-129">   *</span>
-<span class="source-line-no">130</span><span id="line-130">   * @exception NullPointerException if either {@code collection} or {@code p} is {@code null}</span>
-<span class="source-line-no">131</span><span id="line-131">   */</span>
-<span class="source-line-no">132</span><span id="line-132">  @SuppressWarnings("unchecked")</span>
-<span class="source-line-no">133</span><span id="line-133">  public static &lt;C, E&gt; Selectable&lt;C, E&gt; filtering(final Collection&lt;? extends E&gt; collection,</span>
-<span class="source-line-no">134</span><span id="line-134">                                                  final BiPredicate&lt;? super E, ? super C&gt; p) {</span>
-<span class="source-line-no">135</span><span id="line-135">    Objects.requireNonNull(p, "p");</span>
-<span class="source-line-no">136</span><span id="line-136">    return collection.isEmpty() ? empty() : c -&gt; (List&lt;E&gt;)collection.stream().filter(e -&gt; p.test(e, c)).toList();</span>
-<span class="source-line-no">137</span><span id="line-137">  }</span>
-<span class="source-line-no">138</span><span id="line-138"></span>
-<span class="source-line-no">139</span><span id="line-139">  </span>
-<span class="source-line-no">140</span><span id="line-140">}</span>
+<span class="source-line-no">130</span><span id="line-130">   * @param &lt;E&gt; the element type</span>
+<span class="source-line-no">131</span><span id="line-131">   *</span>
+<span class="source-line-no">132</span><span id="line-132">   * @param s a non-{@code null} {@link Selectable} accepting {@link Annotated Annotated&amp;lt;AnnotatedConstruct&amp;gt;}</span>
+<span class="source-line-no">133</span><span id="line-133">   * instances</span>
+<span class="source-line-no">134</span><span id="line-134">   *</span>
+<span class="source-line-no">135</span><span id="line-135">   * @param annotationElementInclusionPredicate a {@link Predicate} that returns {@code true} if a given {@link</span>
+<span class="source-line-no">136</span><span id="line-136">   * ExecutableElement}, representing an annotation element, is to be included in comparison operations; may be {@code</span>
+<span class="source-line-no">137</span><span id="line-137">   * null} in which case it is as if {@code e -&gt; true} were supplied instead</span>
+<span class="source-line-no">138</span><span id="line-138">   *</span>
+<span class="source-line-no">139</span><span id="line-139">   * @return a non-{@code null}, determinate {@link Selectable} accepting {@link AnnotatedConstruct} instances</span>
+<span class="source-line-no">140</span><span id="line-140">   *</span>
+<span class="source-line-no">141</span><span id="line-141">   * @exception NullPointerException if {@code s} is {@code null}</span>
+<span class="source-line-no">142</span><span id="line-142">   *</span>
+<span class="source-line-no">143</span><span id="line-143">   * @see Annotated</span>
+<span class="source-line-no">144</span><span id="line-144">   *</span>
+<span class="source-line-no">145</span><span id="line-145">   * @see Annotated#of(AnnotatedConstruct, Predicate)</span>
+<span class="source-line-no">146</span><span id="line-146">   *</span>
+<span class="source-line-no">147</span><span id="line-147">   * @see AnnotatedConstruct</span>
+<span class="source-line-no">148</span><span id="line-148">   */</span>
+<span class="source-line-no">149</span><span id="line-149">  @Deprecated(forRemoval = true) // Annotated.of(AnnotatedConstruct) exists</span>
+<span class="source-line-no">150</span><span id="line-150">  public static &lt;C extends AnnotatedConstruct, E&gt; Selectable&lt;C, E&gt; convert(final Selectable&lt;? super Annotated&lt;C&gt;, E&gt; s,</span>
+<span class="source-line-no">151</span><span id="line-151">                                                                           final Predicate&lt;? super ExecutableElement&gt; annotationElementInclusionPredicate) {</span>
+<span class="source-line-no">152</span><span id="line-152">    return ac -&gt; s.select(Annotated.of(ac, annotationElementInclusionPredicate));</span>
+<span class="source-line-no">153</span><span id="line-153">  }</span>
+<span class="source-line-no">154</span><span id="line-154"></span>
+<span class="source-line-no">155</span><span id="line-155">  /**</span>
+<span class="source-line-no">156</span><span id="line-156">   * Returns a {@link Selectable} whose {@link Selectable#select(Object)} method always returns an {@linkplain List#of()</span>
+<span class="source-line-no">157</span><span id="line-157">   * empty, immutable &lt;code&gt;List&lt;/code&gt;}.</span>
+<span class="source-line-no">158</span><span id="line-158">   *</span>
+<span class="source-line-no">159</span><span id="line-159">   * &lt;p&gt;This method is useful primarily for completeness and for testing pathological situations.&lt;/p&gt;</span>
+<span class="source-line-no">160</span><span id="line-160">   *</span>
+<span class="source-line-no">161</span><span id="line-161">   * @param &lt;C&gt; the criteria type</span>
+<span class="source-line-no">162</span><span id="line-162">   *</span>
+<span class="source-line-no">163</span><span id="line-163">   * @param &lt;E&gt; the element type</span>
+<span class="source-line-no">164</span><span id="line-164">   *</span>
+<span class="source-line-no">165</span><span id="line-165">   * @return a non-{@code null} {@link Selectable}</span>
+<span class="source-line-no">166</span><span id="line-166">   */</span>
+<span class="source-line-no">167</span><span id="line-167">  public static final &lt;C, E&gt; Selectable&lt;C, E&gt; empty() {</span>
+<span class="source-line-no">168</span><span id="line-168">    return Selectables::empty;</span>
+<span class="source-line-no">169</span><span id="line-169">  }</span>
+<span class="source-line-no">170</span><span id="line-170"></span>
+<span class="source-line-no">171</span><span id="line-171">  private static final &lt;C, E&gt; List&lt;E&gt; empty(final C ignored) {</span>
+<span class="source-line-no">172</span><span id="line-172">    return List.of();</span>
+<span class="source-line-no">173</span><span id="line-173">  }</span>
+<span class="source-line-no">174</span><span id="line-174"></span>
+<span class="source-line-no">175</span><span id="line-175">  /**</span>
+<span class="source-line-no">176</span><span id="line-176">   * Returns a {@link Selectable} using the supplied {@link Collection} as its elements, and the supplied {@link</span>
+<span class="source-line-no">177</span><span id="line-177">   * BiPredicate} as its &lt;em&gt;selector&lt;/em&gt;.</span>
+<span class="source-line-no">178</span><span id="line-178">   *</span>
+<span class="source-line-no">179</span><span id="line-179">   * &lt;p&gt;There is no guarantee that this method will return new {@link Selectable} instances.&lt;/p&gt;</span>
+<span class="source-line-no">180</span><span id="line-180">   *</span>
+<span class="source-line-no">181</span><span id="line-181">   * &lt;p&gt;The {@link Selectable} instances returned by this method may or may not cache their selections.&lt;/p&gt;</span>
+<span class="source-line-no">182</span><span id="line-182">   *</span>
+<span class="source-line-no">183</span><span id="line-183">   * &lt;p&gt;The selector tests its first argument to see if it is &lt;dfn&gt;selected&lt;/dfn&gt; by its second argument. The selector</span>
+<span class="source-line-no">184</span><span id="line-184">   * is invoked repeatedly. If, for any given invocation, the first argument is selected, the selected element is added</span>
+<span class="source-line-no">185</span><span id="line-185">   * to the selection that is eventually returned as a sublist of the supplied {@link Collection}. The selector must</span>
+<span class="source-line-no">186</span><span id="line-186">   * additionally be idempotent and must produce a determinate value when given the same arguments.&lt;/p&gt;</span>
+<span class="source-line-no">187</span><span id="line-187">   *</span>
+<span class="source-line-no">188</span><span id="line-188">   * &lt;p&gt;No validation of these semantics of the selector is performed.&lt;/p&gt;</span>
+<span class="source-line-no">189</span><span id="line-189">   *</span>
+<span class="source-line-no">190</span><span id="line-190">   * @param &lt;C&gt; the criteria type</span>
+<span class="source-line-no">191</span><span id="line-191">   *</span>
+<span class="source-line-no">192</span><span id="line-192">   * @param &lt;E&gt; the element type</span>
+<span class="source-line-no">193</span><span id="line-193">   *</span>
+<span class="source-line-no">194</span><span id="line-194">   * @param collection a {@link Collection} of elements from which sublists may be selected; must not be {@code null}</span>
+<span class="source-line-no">195</span><span id="line-195">   *</span>
+<span class="source-line-no">196</span><span id="line-196">   * @param p the selector; must not be {@code null}</span>
+<span class="source-line-no">197</span><span id="line-197">   *</span>
+<span class="source-line-no">198</span><span id="line-198">   * @return a {@link Selectable}; never {@code null}</span>
+<span class="source-line-no">199</span><span id="line-199">   *</span>
+<span class="source-line-no">200</span><span id="line-200">   * @exception NullPointerException if either {@code collection} or {@code p} is {@code null}</span>
+<span class="source-line-no">201</span><span id="line-201">   */</span>
+<span class="source-line-no">202</span><span id="line-202">  @SuppressWarnings("unchecked")</span>
+<span class="source-line-no">203</span><span id="line-203">  public static &lt;C, E&gt; Selectable&lt;C, E&gt; filtering(final Collection&lt;? extends E&gt; collection,</span>
+<span class="source-line-no">204</span><span id="line-204">                                                  final BiPredicate&lt;? super E, ? super C&gt; p) {</span>
+<span class="source-line-no">205</span><span id="line-205">    requireNonNull(p, "p");</span>
+<span class="source-line-no">206</span><span id="line-206">    return collection.isEmpty() ? empty() : c -&gt; (List&lt;E&gt;)collection.stream().filter(e -&gt; p.test(e, c)).toList();</span>
+<span class="source-line-no">207</span><span id="line-207">  }</span>
+<span class="source-line-no">208</span><span id="line-208"></span>
+<span class="source-line-no">209</span><span id="line-209">  /*</span>
+<span class="source-line-no">210</span><span id="line-210">   * An &lt;strong&gt;experimental&lt;/strong&gt; convenience method that returns a non-{@code null}, determinate {@link Selectable}</span>
+<span class="source-line-no">211</span><span id="line-211">   * representing the composition of the supplied {@link Selectable} with the supplied {@code argumentTransformer} {@link</span>
+<span class="source-line-no">212</span><span id="line-212">   * Function}.</span>
+<span class="source-line-no">213</span><span id="line-213">   *</span>
+<span class="source-line-no">214</span><span id="line-214">   * @param &lt;B&gt; the (criteria) type of the sole parameter of the returned {@link Selectable}</span>
+<span class="source-line-no">215</span><span id="line-215">   *</span>
+<span class="source-line-no">216</span><span id="line-216">   * @param &lt;C&gt; the (criteria) type of the sole parameter of the supplied {@link Selectable}</span>
+<span class="source-line-no">217</span><span id="line-217">   *</span>
+<span class="source-line-no">218</span><span id="line-218">   * @param &lt;E&gt; the element type of both {@link Selectable}s</span>
+<span class="source-line-no">219</span><span id="line-219">   *</span>
+<span class="source-line-no">220</span><span id="line-220">   * @param selectable a non-{@code null} {@link Selectable}</span>
+<span class="source-line-no">221</span><span id="line-221">   *</span>
+<span class="source-line-no">222</span><span id="line-222">   * @param argumentTransformer a non-{@code null} {@link Function} that maps its sole parameter (of type {@code B}) to</span>
+<span class="source-line-no">223</span><span id="line-223">   * a value of type {@code C} suitable for supplying as criteria to the supplied {@link Selectable}; must be idempotent</span>
+<span class="source-line-no">224</span><span id="line-224">   * and return a determinate value</span>
+<span class="source-line-no">225</span><span id="line-225">   *</span>
+<span class="source-line-no">226</span><span id="line-226">   * @return a non-{@code null}, determinate, composed {@link Selectable}</span>
+<span class="source-line-no">227</span><span id="line-227">   *</span>
+<span class="source-line-no">228</span><span id="line-228">   * @exception NullPointerException if any argument is {@code null}</span>
+<span class="source-line-no">229</span><span id="line-229">   *</span>
+<span class="source-line-no">230</span><span id="line-230">   * @see Function#compose(Function)</span>
+<span class="source-line-no">231</span><span id="line-231">   */</span>
+<span class="source-line-no">232</span><span id="line-232">  /*</span>
+<span class="source-line-no">233</span><span id="line-233">  public static &lt;B, C, E&gt; Selectable&lt;B, E&gt; compose(final Selectable&lt;? super C, E&gt; selectable,</span>
+<span class="source-line-no">234</span><span id="line-234">                                                   final Function&lt;? super B, ? extends C&gt; argumentTransformer) {</span>
+<span class="source-line-no">235</span><span id="line-235">    return ((Function&lt;C, List&lt;E&gt;&gt;)selectable::select).compose(argumentTransformer)::apply;</span>
+<span class="source-line-no">236</span><span id="line-236">  }</span>
+<span class="source-line-no">237</span><span id="line-237">  */</span>
+<span class="source-line-no">238</span><span id="line-238"></span>
+<span class="source-line-no">239</span><span id="line-239">}</span>
 
 
 
